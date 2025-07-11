@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能网球分析系统</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0c162d 0%, #1a2a4a 100%);
+            color: #e0f0ff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* 网格背景效果 */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                linear-gradient(rgba(18, 33, 66, 0.8) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(18, 33, 66, 0.8) 1px, transparent 1px);
+            background-size: 20px 20px;
+            z-index: -1;
+        }
+
+        /* 标题栏样式 */
+        .header {
+            background: rgba(10, 20, 40, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 2px solid rgba(0, 167, 255, 0.5);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
+            position: relative;
+            z-index: 10;
+        }
+
+        .header h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #00c6ff, #0072ff, #00ffcc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 1px;
+            text-shadow: 0 0 15px rgba(0, 178, 255, 0.3);
+        }
+
+        .header-info {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            font-size: 1.1rem;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #00ff55;
+            box-shadow: 0 0 10px #00ff55;
+        }
+
+        .datetime {
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+            color: #a0cfff;
+        }
+
+        /* 主内容区 */
+        .dashboard {
+            padding: 25px;
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 25px;
+            height: calc(100vh - 100px);
+        }
+
+        /* 视频监控区域 */
+        .video-section {
+            grid-column: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .camera-container {
+            background: rgba(8, 18, 35, 0.7);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(0, 120, 215, 0.3);
+        }
+
+        .camera-feed {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            background: linear-gradient(45deg, #0a1a30, #0d2b50);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .camera-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 20px;
+            pointer-events: none;
+        }
+
+        .camera-title {
+            background: rgba(0, 40, 80, 0.7);
+            color: #00ccff;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 1.2rem;
+            align-self: center;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(0, 180, 255, 0.3);
+        }
+
+        .camera-info {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .camera-stats {
+            background: rgba(0, 30, 60, 0.7);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(0, 150, 255, 0.3);
+        }
+
+        /* 数据面板 */
+        .panel {
+            background: rgba(8, 18, 35, 0.7);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 120, 215, 0.3);
+            backdrop-filter: blur(5px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel-title {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid rgba(0, 167, 255, 0.5);
+            color: #00ccff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel-title i {
+            font-size: 1.2rem;
+        }
+
+        .panel-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #66aaff;
+            font-size: 1.2rem;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .panel-content .placeholder {
+            max-width: 80%;
+            line-height: 1.6;
+        }
+
+        .panel-content i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            color: rgba(0, 180, 255, 0.5);
+        }
+
+        /* 动画效果 */
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 200, 255, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 200, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 200, 255, 0); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 1200px) {
+            .dashboard {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .video-section {
+                grid-column: 1 / -1;
+                grid-row: 1;
+            }
+
+            .panel-left {
+                grid-column: 1;
+                grid-row: 2;
+            }
+
+            .panel-right {
+                grid-column: 2;
+                grid-row: 2;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .panel-left, .panel-right {
+                grid-column: 1;
+            }
+
+            .panel-right {
+                grid-row: 3;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 标题栏 -->
+    <header class="header">
+        <h1>智能网球分析系统</h1>
+        <div class="header-info">
+            <div class="status-indicator">
+                <div class="status-dot pulse"></div>
+                <span>实时分析中</span>
+            </div>
+            <div class="datetime" id="datetime">2023年11月15日 14:30:45</div>
+        </div>
+    </header>
+
+    <!-- 主仪表盘 -->
+    <main class="dashboard">
+        <!-- 左侧数据面板 -->
+        <div class="panel panel-left">
+            <div class="panel-title">
+                <i class="fas fa-chart-line"></i>
+                球员数据统计
+            </div>
+            <div class="panel-content">
+                <div class="placeholder">
+                    <i class="fas fa-user-chart"></i>
+                    <p>球员数据统计面板</p>
+                    <p>（等待数据接入）</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 中间视频区域 -->
+        <div class="video-section">
+            <div class="camera-container">
+                <div class="camera-feed" id="camera-feed">
+                    <!-- 显示OpenCV处理后的帧流 -->
+                    <img id="live-stream" style="width: 100%; height: 100%; object-fit: cover; display: none;" />
+
+                    <!-- 未连接时的占位提示 -->
+                    <div class="camera-placeholder">
+                        <i class="fas fa-video" style="font-size: 5rem; color: rgba(100, 180, 255, 0.3); margin-bottom: 20px;"></i>
+                        <p style="font-size: 1.5rem; color: #66aaff; margin-bottom: 15px;">等待OpenCV帧流接入</p>
+                        <p style="color: #88aadd; max-width: 80%; line-height: 1.6;">
+                            请确保Python服务已启动，点击"重新连接"接收处理后的画面
+                        </p>
+                    </div>
+                </div>
+
+                <div class="camera-overlay">
+                    <div class="camera-title">网球姿态分析 - 实时帧流</div>
+                    <div class="camera-info">
+                        <div class="camera-stats">
+                            <i class="fas fa-image"></i> 姿态识别中
+                        </div>
+                        <div class="camera-stats">
+                            <i class="fas fa-microchip"></i> 帧速率: <span id="fps">0</span> FPS
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="camera-controls" style="display: flex; gap: 15px;">
+                <button class="camera-btn" id="connect-btn" style="flex:1; background: rgba(0, 120, 215, 0.3); border: 1px solid rgba(0, 150, 255, 0.5); color: #a0d0ff; padding: 12px; border-radius: 8px; font-size: 1.1rem; cursor: pointer; transition: all 0.3s;">
+                    <i class="fas fa-sync-alt"></i> 重新连接
+                </button>
+                <button class="camera-btn" style="flex:1; background: rgba(0, 120, 215, 0.3); border: 1px solid rgba(0, 150, 255, 0.5); color: #a0d0ff; padding: 12px; border-radius: 8px; font-size: 1.1rem; cursor: pointer; transition: all 0.3s;">
+                    <i class="fas fa-cog"></i> 设置
+                </button>
+                <button class="camera-btn" style="flex:1; background: rgba(0, 120, 215, 0.3); border: 1px solid rgba(0, 150, 255, 0.5); color: #a0d0ff; padding: 12px; border-radius: 8px; font-size: 1.1rem; cursor: pointer; transition: all 0.3s;">
+                    <i class="fas fa-expand"></i> 全屏
+                </button>
+            </div>
+
+
+
+        </div>
+
+        <!-- 右侧分析面板 -->
+        <div class="panel panel-right">
+            <div class="panel-title">
+                <i class="fas fa-brain"></i>
+                AI分析结果
+            </div>
+            <div class="panel-content">
+                <div class="placeholder">
+                    <i class="fas fa-robot"></i>
+                    <p>实时分析结果面板</p>
+                    <p>（等待数据处理）</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // 更新时间显示
+        function updateDateTime() {
+            const now = new Date();
+            const options = {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            };
+            document.getElementById('datetime').textContent = now.toLocaleDateString('zh-CN', options);
+        }
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+
+        // 帧流相关逻辑
+        const streamImg = document.getElementById('live-stream');
+        const placeholder = document.querySelector('.camera-placeholder');
+        const statsElement = document.querySelector('.camera-stats:last-child');
+        const fpsElement = document.getElementById('fps');
+        let lastFrameTime = 0;
+        let frameCount = 0;
+        let fpsInterval;
+
+        // 连接OpenCV帧流
+        function connectStream() {
+            // 显示连接状态
+            statsElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 正在连接帧流...';
+
+            // 重置FPS计数器
+            lastFrameTime = performance.now();
+            frameCount = 0;
+            if (fpsInterval) clearInterval(fpsInterval);
+
+            // 本地帧流服务地址
+            const streamUrl = 'http://localhost:5001/opencv-stream';
+
+            // 监听帧加载事件以计算FPS
+            streamImg.onload = function() {
+                // 显示视频流
+                streamImg.style.display = 'block';
+                placeholder.style.display = 'none';
+                statsElement.innerHTML = '<i class="fas fa-microchip"></i> 帧速率: <span id="fps">0</span> FPS';
+
+                // 计算FPS
+                const now = performance.now();
+                frameCount++;
+
+                if (now - lastFrameTime >= 1000) {
+                    fpsElement.textContent = Math.round((frameCount * 1000) / (now - lastFrameTime));
+                    frameCount = 0;
+                    lastFrameTime = now;
+                }
+            };
+
+            streamImg.onerror = function() {
+                // 连接失败处理
+                streamImg.style.display = 'none';
+                placeholder.style.display = 'flex';
+                placeholder.innerHTML = `
+                    <i class="fas fa-exclamation-triangle" style="font-size: 5rem; color: #ff6666; margin-bottom: 20px;"></i>
+                    <p style="font-size: 1.5rem; color: #ff6666; margin-bottom: 15px;">帧流连接失败</p>
+                    <p style="color: #88aadd; max-width: 80%;">
+                        请检查Python服务是否运行，或刷新页面重试
+                    </p>
+                `;
+                statsElement.innerHTML = '<i class="fas fa-times"></i> 连接失败';
+            };
+
+            // 设置流地址（加时间戳防止缓存）
+            streamImg.src = streamUrl + '?' + new Date().getTime();
+
+            // 定期更新FPS显示
+            fpsInterval = setInterval(() => {
+                if (streamImg.style.display === 'block') {
+                    const now = performance.now();
+                    if (now - lastFrameTime >= 1000) {
+                        fpsElement.textContent = Math.round((frameCount * 1000) / (now - lastFrameTime));
+                        frameCount = 0;
+                        lastFrameTime = now;
+                    }
+                }
+            }, 1000);
+        }
+
+        // 绑定"重新连接"按钮事件
+        document.getElementById('connect-btn').addEventListener('click', connectStream);
+    </script>
+</body>
+</html>
