@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网球王子 - 网球数据分析助手</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#36BFFA',
+                        dark: '#0F172A',
+                        light: '#F8FAFC',
+                        accent: '#7C3AED',
+                        success: '#10B981',
+                        warning: '#F59E0B',
+                        danger: '#EF4444'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 3s ease-in-out infinite',
+                        'glow': 'glow 2s ease-in-out infinite alternate'
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' }
+                        },
+                        glow: {
+                            '0%': { boxShadow: '0 0 5px rgba(22, 93, 255, 0.5)' },
+                            '100%': { boxShadow: '0 0 20px rgba(22, 93, 255, 0.8)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            .bg-gradient-tech {
+                background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+            }
+            .scrollbar-hide::-webkit-scrollbar {
+                display: none;
+            }
+            .scrollbar-hide {
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+            .glass-effect {
+                backdrop-filter: blur(10px);
+                background-color: rgba(30, 41, 59, 0.7);
+            }
+            /* 深色模式样式 */
+            .dark-theme {
+                --bg-primary: #0F172A; /* 深色背景 */
+                --bg-secondary: #1E293B; /* 深色次级背景 */
+                --text-primary: #F8FAFC; /* 浅色文字 */
+                --border-color: rgba(22, 93, 255, 0.3); /* 边框色 */
+                --bg-gradient: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+            }
+
+            /* 浅色模式样式 */
+            .light-theme {
+                --bg-primary: #FFFFFF; /* 浅色背景 */
+                --bg-secondary: #FFFFFF; /* 浅色次级背景 */
+                --text-primary: #0F172A; /* 深色文字 */
+                --border-color: rgba(22, 93, 255, 0.2); /* 边框色 */
+                --bg-gradient: linear-gradient(135deg, #F8FAFC 0%, #E2E8F0 100%);
+            }
+
+            /* 应用主题变量 */
+            body {
+                background: var(--bg-gradient);
+                color: var(--text-primary);
+                transition: background-color 0.3s ease;
+            }
+
+            .bg-dark\/50 {
+                background-color: var(--bg-secondary);
+                transition: background-color 0.3s ease;
+            }
+
+            .border-primary\/20, .border-primary\/30 {
+                border-color: var(--border-color);
+                transition: border-color 0.3s ease;
+            }
+
+            .glass-effect {
+                backdrop-filter: blur(10px);
+                background-color: rgba(30, 41, 59, 0.7);
+                transition: background-color 0.3s ease;
+            }
+
+            .light-theme .glass-effect {
+                background-color: rgba(248, 250, 252, 0.7);
+            }
+
+            .light-theme .text-light {
+                color: #0F172A;
+            }
+
+            .light-theme .bg-primary\/20 {
+                background-color: rgba(22, 93, 255, 0.1);
+            }
+
+            .light-theme .bg-dark\/70 {
+                background-color: rgba(248, 250, 252, 0.9);
+            }
+
+            .light-theme .text-gray-300 {
+                color: #475569;
+            }
+
+            .light-theme .text-gray-400 {
+                color: #64748B;
+            }
+            
+            /* 新增的按钮禁用样式 */
+            .button-disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+                transform: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen font-sans">
+    <!-- 顶部导航 -->
+    <header class="glass-effect border-b border-primary/20 sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <i class="fa fa-tennis-ball text-primary text-3xl animate-pulse-slow"></i>
+                <h1 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary">网球王子</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <button id="theme-toggle" class="p-2 rounded-full hover:bg-primary/20 transition-all">
+                    <i class="fa fa-moon-o text-light"></i>
+                </button>
+                <button id="clear-history" class="p-2 rounded-full hover:bg-primary/20 transition-all">
+                    <i class="fa fa-trash-o text-light"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8 max-w-5xl">
+        <!-- 介绍卡片 -->
+        <div class="bg-dark/50 rounded-xl p-6 mb-8 border border-primary/30 shadow-lg shadow-primary/10 transform hover:scale-[1.01] transition-all">
+            <div class="flex justify-center mb-4">
+                <img 
+                    src="/static/tennis_prince.jpg" 
+                    alt="网球王子" 
+                    class="w-32 h-32 rounded-full border-4 border-primary/30 shadow-lg"
+                >
+            </div>
+            <div class="flex items-start space-x-4">
+                <div class="text-primary text-4xl animate-float">
+                    <i class="fa fa-robot"></i>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold mb-2">您好！我是网球王子</h2>
+                    <p class="text-gray-300">我是由HelloWorld团队研发的网球小助手，专注于网球训练数据分析。有任何关于网球训练的问题，都可以问我哦！</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 聊天区域 -->
+        <div class="flex flex-col h-[60vh] bg-gray-50 rounded-xl overflow-hidden border border-primary/20 shadow-xl">
+            <!-- 聊天历史 -->
+            <div id="chat-history" class="flex-1 p-6 overflow-y-auto scrollbar-hide space-y-6">
+                
+            </div>
+
+            <!-- 输入区域 -->
+            <div class="border-t border-primary/20 p-4 glass-effect">
+                <form id="chat-form" class="flex space-x-3">
+                    <input 
+                        type="text" 
+                        id="user-input" 
+                        placeholder="请输入你的问题..." 
+                        class="flex-1 bg-dark/60 border border-primary/30 rounded-full px-5 py-3 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+                    >
+                    <button 
+                        id="send-button"
+                        type="submit" 
+                        class="bg-primary hover:bg-primary/80 text-white rounded-full p-3 transition-all hover:scale-110 active:scale-95 shadow-lg shadow-primary/20"
+                    >
+                        <i class="fa fa-paper-plane"></i>
+                    </button>
+                </form>
+                <div class="text-xs text-gray-400 mt-2 text-center hidden" id="typing-indicator">
+                    <i class="fa fa-circle-o-notch fa-spin"></i> 正在思考中...
+                </div>
+            </div>
+        </div>
+
+        <!-- 数据统计 -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
+            <div class="bg-dark/50 rounded-lg p-4 border border-primary/20">
+                <h3 class="text-gray-400 text-sm mb-1">平均响应时间</h3>
+                <p class="text-2xl font-bold text-primary" id="avg-response-time">0.00s</p>
+            </div>
+            <div class="bg-dark/50 rounded-lg p-4 border border-primary/20">
+                <h3 class="text-gray-400 text-sm mb-1">今日对话次数</h3>
+                <p class="text-2xl font-bold text-secondary" id="conversation-count">0</p>
+            </div>
+            <div class="bg-dark/50 rounded-lg p-4 border border-primary/20">
+                <h3 class="text-gray-400 text-sm mb-1">当前状态</h3>
+                <p class="text-2xl font-bold text-success" id="status">
+                    <i class="fa fa-check-circle"></i> 在线
+                </p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="mt-12 py-6 border-t border-primary/20 glass-effect">
+        <div class="container mx-auto px-4 text-center text-gray-400 text-sm">
+            <p>内容由 AI 生成，请仔细甄别</p>
+            <p>© 2025 网球王子 - 由HelloWorld团队研发</p>
+            <p class="mt-1">专注于网球训练数据分析的智能助手</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const chatForm = document.getElementById('chat-form');
+            const userInput = document.getElementById('user-input');
+            const chatHistory = document.getElementById('chat-history');
+            const typingIndicator = document.getElementById('typing-indicator');
+            const clearHistoryBtn = document.getElementById('clear-history');
+            const avgResponseTimeEl = document.getElementById('avg-response-time');
+            const conversationCountEl = document.getElementById('conversation-count');
+            const themeToggle = document.getElementById('theme-toggle');
+            const themeIcon = themeToggle.querySelector('i');
+            const htmlElement = document.documentElement;
+            const sendButton = document.getElementById('send-button');
+            
+            let conversationCount = 0;
+            let totalResponseTime = 0;
+            let isThinking = false; // 新增状态标志
+            
+            // 初始化主题（优先读取本地存储，无则使用系统偏好）
+            function initTheme() {
+                const savedTheme = localStorage.getItem('preferred-theme');
+                const isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+                if (savedTheme === 'dark' || (!savedTheme && isDarkMode)) {
+                    enableDarkMode();
+                } else {
+                    enableLightMode();
+                }
+            }
+
+            // 启用深色模式
+            function enableDarkMode() {
+                htmlElement.classList.add('dark-theme');
+                htmlElement.classList.remove('light-theme');
+                themeIcon.classList.remove('fa-sun-o');
+                themeIcon.classList.add('fa-moon-o');
+                localStorage.setItem('preferred-theme', 'dark');
+            }
+
+            // 启用浅色模式
+            function enableLightMode() {
+                htmlElement.classList.add('light-theme');
+                htmlElement.classList.remove('dark-theme');
+                themeIcon.classList.remove('fa-moon-o');
+                themeIcon.classList.add('fa-sun-o');
+                localStorage.setItem('preferred-theme', 'light');
+            }
+
+            // 绑定切换事件
+            themeToggle.addEventListener('click', () => {
+                const isDark = htmlElement.classList.contains('dark-theme');
+                if (isDark) {
+                    enableLightMode();
+                } else {
+                    enableDarkMode();
+                }
+            });
+            
+            // 处理表单提交
+            chatForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                // 如果正在思考中，禁止发送新消息
+                if (isThinking) {
+                    return;
+                }
+                
+                const question = userInput.value.trim();
+                
+                if (!question) return;
+                
+                // 添加用户消息到历史记录
+                addMessageToHistory(question, 'user');
+                
+                // 清空输入框
+                userInput.value = '';
+                
+                // 显示正在输入指示器
+                typingIndicator.classList.remove('hidden');
+                
+                // 禁用发送按钮并添加样式
+                isThinking = true;
+                sendButton.disabled = true;
+                sendButton.classList.add('button-disabled');
+                
+                try {
+                    // 发送请求到后端
+                    const response = await fetch('/ask', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ question })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        // 更新统计数据
+                        conversationCount++;
+                        totalResponseTime += data.response_time;
+                        updateStats();
+                        
+                        // 添加回答到历史记录
+                        addMessageToHistory(data.answer, 'bot');
+                    } else {
+                        addMessageToHistory(`抱歉，出现错误: ${data.error}`, 'bot', true);
+                    }
+                } catch (error) {
+                    addMessageToHistory('抱歉，无法连接到服务器', 'bot', true);
+                    console.error('Error:', error);
+                } finally {
+                    // 隐藏正在输入指示器
+                    typingIndicator.classList.add('hidden');
+                    
+                    // 重新启用发送按钮并移除样式
+                    isThinking = false;
+                    sendButton.disabled = false;
+                    sendButton.classList.remove('button-disabled');
+                }
+            });
+            
+            // 清除历史记录
+            clearHistoryBtn.addEventListener('click', async () => {
+                if (isThinking) {
+                    alert('请等待当前问题处理完成后再清除历史');
+                    return;
+                }
+                
+                if (confirm('确定要清除聊天历史吗？')) {
+                    try {
+                        await fetch('/clear-history', { method: 'POST' });
+                        chatHistory.innerHTML = '';
+                        conversationCount = 0;
+                        totalResponseTime = 0;
+                        updateStats();
+                        
+                        // 添加初始消息
+                        addMessageToHistory('嗨！我是网球王子，你的专属网球数据分析助手。请告诉我你的网球训练相关问题，我会尽力为你解答！', 'bot');
+                    } catch (error) {
+                        console.error('Error clearing history:', error);
+                    }
+                }
+            });
+            
+            // 添加消息到历史记录
+            function addMessageToHistory(content, sender, isError = false) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `flex items-start space-x-3 animate-fade-in`;
+                
+                if (sender === 'user') {
+                    messageDiv.className = 'flex items-start justify-end space-x-3';
+                    messageDiv.innerHTML = `
+                        <div class="bg-primary/20 rounded-lg rounded-tr-none p-4 max-w-[80%] border border-primary/30 ${isError ? 'border-danger/50 bg-danger/10' : ''}">
+                            <p>${content}</p>
+                        </div>
+                        <div class="bg-secondary/20 p-2 rounded-full">
+                            <i class="fa fa-user text-secondary"></i>
+                        </div>
+                    `;
+                } else {
+                    messageDiv.innerHTML = `
+                        <div class="bg-primary/20 p-2 rounded-full">
+                            <i class="fa fa-robot text-primary"></i>
+                        </div>
+                        <div class="bg-dark/70 rounded-lg rounded-tl-none p-4 max-w-[80%] border border-primary/10 ${isError ? 'border-danger/50 bg-danger/10' : ''}">
+                            <p>${content}</p>
+                        </div>
+                    `;
+                }
+                
+                chatHistory.appendChild(messageDiv);
+                chatHistory.scrollTop = chatHistory.scrollHeight;
+            }
+            
+            // 更新统计数据
+            function updateStats() {
+                const avgTime = conversationCount > 0 ? (totalResponseTime / conversationCount).toFixed(2) : '0.00';
+                avgResponseTimeEl.textContent = `${avgTime}s`;
+                conversationCountEl.textContent = conversationCount;
+            }
+            
+            // 允许按Enter发送消息，Shift+Enter换行
+            userInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault(); // 防止默认行为（可能引起页面刷新）
+                    chatForm.dispatchEvent(new Event('submit'));
+                }
+            });
+            
+            // 初始化主题
+            initTheme();
+        });
+    </script>
+</body>
+</html>
