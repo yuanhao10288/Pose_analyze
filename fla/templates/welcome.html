@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能网球分析系统 - 欢迎</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0c162d 0%, #1a2a4a 100%);
+            color: #e0f0ff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 网格和网球场纹理背景 */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                linear-gradient(rgba(18, 33, 66, 0.8) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(18, 33, 66, 0.8) 1px, transparent 1px),
+                linear-gradient(45deg, rgba(0, 100, 0, 0.2) 0%, transparent 20%);
+            background-size: 20px 20px, 20px 20px, 100px 100px;
+            z-index: -1;
+        }
+
+        /* 左上角品牌区 */
+        .brand-area {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-area img {
+            width: 40px;
+            height: auto;
+        }
+
+        .brand-title {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #00c6ff, #0072ff, #00ffcc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 15px rgba(0, 178, 255, 0.4);
+        }
+
+        /* 主内容区域 */
+        .main-content {
+            display: flex;
+            width: 90%;
+            max-width: 1200px;
+            margin-top: 100px; /* 留出品牌区空间 */
+        }
+
+        .racket-area {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .racket-area img {
+            max-width: 100%;
+            height: auto;
+            /* 移除圆角和阴影，让图片与背景融合 */
+            border-radius: 0;
+            box-shadow: none;
+            animation: scalePulse 2s infinite ease-in-out; /* 添加放大缩小动画 */
+        }
+        @keyframes scalePulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); } /* 小幅度放大 5% */
+            100% { transform: scale(1); }
+        }
+
+        .text-area {
+            flex: 2;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .text-area h2 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #00c6ff, #0072ff, #00ffcc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 15px rgba(0, 178, 255, 0.4);
+            margin-bottom: 25px;
+            animation: glow 3s infinite; /* 添加文字发光动画 */
+        }
+
+        .text-area .sub-title {
+            font-size: 2.3rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #00ffcc, #0072ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 0 15px rgba(0, 178, 255, 0.4);
+            margin-bottom: 80px;
+            animation: glow 3s infinite; /* 添加文字发光动画 */
+        }
+
+        .text-area p {
+            font-size: 1.5rem;
+            color: #ffffff;
+            margin-bottom: 70px;
+            line-height: 1.7;
+            padding:0 20px;
+        }
+        @keyframes glow {
+            0% { text-shadow: 0 0 5px rgba(0, 178, 255, 0.3); }
+            50% { text-shadow: 0 0 10px rgba(0, 178, 255, 0.5); }
+            100% { text-shadow: 0 0 5px rgba(0, 178, 255, 0.3); }
+        }
+
+        /* 网球装饰元素 */
+        .tennis-decor {
+            position: absolute;
+            font-size: 2rem;
+            color: rgba(0, 200, 255, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .tennis-ball-1 { top: 20px; left: 20px; }
+        .tennis-ball-2 { bottom: 20px; right: 20px; }
+        .tennis-racket-1 { top: 50%; left: -30px; transform: rotate(-45deg); }
+        .tennis-racket-2 { top: 50%; right: -30px; transform: rotate(45deg); }
+
+        .tennis-decor:hover {
+            transform: scale(1.2) rotate(10deg);
+        }
+
+        /* 进入按钮样式 */
+        .enter-btn {
+            background: linear-gradient(45deg, #0072ff, #00c6ff);
+            border: 1px solid rgba(0, 150, 255, 0.7);
+            color: #ffffff;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 1.4rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            position: absolute;
+            bottom: 100px;
+            right: 160px;
+            overflow: hidden;
+        }
+
+        .enter-btn:hover {
+            background: linear-gradient(45deg, #00c6ff, #0072ff);
+            box-shadow: 0 0 20px rgba(0, 200, 255, 0.6);
+            transform: translateY(-3px);
+        }
+
+        /* 网球轨迹效果 */
+        .enter-btn::before {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00ffcc, transparent);
+            top: 50%;
+            left: -100%;
+            animation: trail 2s infinite;
+        }
+
+        @keyframes trail {
+            0% { left: -100%; }
+            50% { left: 100%; }
+            100% { left: 100%; }
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 200, 255, 0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(0, 200, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 200, 255, 0); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @media (max-width: 768px) {
+            .brand-title {
+                font-size: 1.5rem;
+            }
+
+            .brand-area img {
+                width: 30px;
+            }
+
+            .text-area h2 {
+                font-size: 2.5rem;
+            }
+
+            .text-area .sub-title {
+                font-size: 2.5rem;
+            }
+
+            .text-area p {
+                font-size: 1rem;
+            }
+
+            .enter-btn {
+                padding: 12px 30px;
+                font-size: 1.2rem;
+            }
+
+            .racket-area img {
+                max-width: 80%;
+            }
+
+            .main-content {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .racket-area, .text-area {
+                flex: 1;
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- 左上角品牌区 -->
+    <div class="brand-area">
+        <img src="{{ url_for('static', filename='images/tennis.png') }}" alt="Tennis Icon">
+        <div class="brand-title">智能网球分析系统</div>
+    </div>
+
+    <!-- 主内容区域 -->
+    <div class="main-content">
+        <div class="racket-area">
+            <img src="{{ url_for('static', filename='images/racket2.png') }}" alt="Tennis Racket">
+        </div>
+        <div class="text-area">
+            <h2>Welcome to P & A,</h2>
+            <div class="sub-title">Unlock exclusive tennis coaching for you!</div>
+            <p>Experience the advanced tennis posture analysis technology! <br>Click the button below to enter the real-time analysis interface and view the player data and AI analysis results.</p>
+            <button class="enter-btn pulse" onclick="window.location.href='/index'">
+                <i class="fas fa-arrow-right"></i> 点击进入
+            </button>
+        </div>
+    </div>
+
+    <!-- 网球装饰图标 -->
+    <i class="fas fa-tennis-ball tennis-decor tennis-ball-1"></i>
+    <i class="fas fa-tennis-ball tennis-decor tennis-ball-2"></i>
+    <i class="fas fa-table-tennis-paddle-ball tennis-decor tennis-racket-1"></i>
+    <i class="fas fa-table-tennis-paddle-ball tennis-decor tennis-racket-2"></i>
+</body>
+</html>
