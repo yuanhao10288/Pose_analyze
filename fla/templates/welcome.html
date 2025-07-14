@@ -6,6 +6,7 @@
     <title>智能网球分析系统 - 欢迎</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+
         * {
             margin: 0;
             padding: 0;
@@ -14,7 +15,6 @@
         }
 
         body {
-            background: linear-gradient(135deg, #0c162d 0%, #1a2a4a 100%);
             color: #e0f0ff;
             min-height: 100vh;
             display: flex;
@@ -25,7 +25,7 @@
             overflow: hidden;
         }
 
-        /* 网格和网球场纹理背景 */
+        /* 背景图片 */
         body::before {
             content: "";
             position: absolute;
@@ -33,11 +33,9 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background:
-                linear-gradient(rgba(18, 33, 66, 0.8) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(18, 33, 66, 0.8) 1px, transparent 1px),
-                linear-gradient(45deg, rgba(0, 100, 0, 0.2) 0%, transparent 20%);
-            background-size: 20px 20px, 20px 20px, 100px 100px;
+            background: url('{{ url_for("static", filename="images/background.jpg") }}') no-repeat center;
+            background-size: cover;
+            opacity: 1.0; /* 降低透明度 */
             z-index: -1;
         }
 
