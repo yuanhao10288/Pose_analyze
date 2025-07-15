@@ -88,21 +88,22 @@
             color: #a0cfff;
         }
 
-        /* 主内容区 */
+        /* 主内容区 - 调整网格布局比例 */
         .dashboard {
             padding: 25px;
             display: grid;
-            grid-template-columns: 1fr 2fr 1fr;
+            grid-template-columns: 0.5fr 2.5fr 1fr; /* 左侧缩小，中间放大 */
             gap: 25px;
             height: calc(100vh - 100px);
         }
 
-        /* 视频监控区域 */
+        /* 视频监控区域 - 扩大显示空间 */
         .video-section {
             grid-column: 2;
             display: flex;
             flex-direction: column;
             gap: 20px;
+            flex-grow: 1;
         }
 
         .camera-container {
@@ -168,11 +169,11 @@
             border: 1px solid rgba(0, 150, 255, 0.3);
         }
 
-        /* 数据面板 */
+        /* 数据面板 - 左侧面板整体缩小 */
         .panel {
             background: rgba(8, 18, 35, 0.7);
             border-radius: 12px;
-            padding: 25px;
+            padding: 15px; /* 内边距减半 */
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(0, 120, 215, 0.3);
             backdrop-filter: blur(5px);
@@ -181,29 +182,29 @@
         }
 
         .panel-title {
-            font-size: 1.4rem;
-            margin-bottom: 20px;
-            padding-bottom: 12px;
+            font-size: 1.1rem; /* 标题字体缩小 */
+            margin-bottom: 15px; /* 间距缩小 */
+            padding-bottom: 8px;
             border-bottom: 2px solid rgba(0, 167, 255, 0.5);
             color: #00ccff;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .panel-title i {
-            font-size: 1.2rem;
+            font-size: 1rem; /* 图标缩小 */
         }
 
         .panel-content {
             flex: 1;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
             color: #66aaff;
-            font-size: 1.2rem;
+            font-size: 1rem;
             text-align: center;
-            padding: 20px;
+            padding: 10px; /* 内边距减半 */
         }
 
         .panel-content .placeholder {
@@ -212,9 +213,150 @@
         }
 
         .panel-content i {
-            font-size: 3rem;
-            margin-bottom: 20px;
+            font-size: 2rem; /* 图标缩小 */
+            margin-bottom: 10px;
             color: rgba(0, 180, 255, 0.5);
+        }
+
+        /* 按钮样式 - 大小减半 */
+        .btn-expand {
+            width: 60px; /* 原60px */
+            height: 60px; /* 原60px */
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease-in-out;
+            cursor: pointer;
+            margin: 10px auto; /* 间距缩小 */
+            border: none;
+        }
+        
+        .btn-expand:hover {
+            width: 90%;
+            border-radius: 30px; /* 原30px */
+        }
+        
+        .btn-expand:hover .btn-text {
+            opacity: 1;
+            width: auto;
+            padding-left: 15px; /* 原15px */
+        }
+        
+        .btn-text {
+            opacity: 0;
+            width: 0;
+            overflow: hidden;
+            transition: all 0.3s ease-in-out;
+            white-space: nowrap;
+            font-size: 1.1rem; /* 原1.1rem */
+            font-weight: 500;
+        }
+
+        .btn-expand i {
+            font-size: 1rem; /* 图标缩小 */
+        }
+
+        /* 模态框样式 */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-backdrop.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background: rgba(10, 20, 40, 0.95);
+            border-radius: 18px; /* 原12px → 翻倍至24px */
+            max-width: 750px; /* 原500px → 翻倍至1000px */
+            width: 90%;
+            padding: 38px; /* 原25px → 翻倍至50px */
+            border: 1.5px solid rgba(0, 150, 255, 0.5); /* 原1px → 翻倍至2px */
+            box-shadow: 0 15px 60px rgba(0, 0, 0, 0.5); /* 阴影范围翻倍 */
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-backdrop.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px; /* 原20px → 翻倍至40px */
+            padding-bottom: 15px; /* 原10px → 翻倍至20px */
+            border-bottom: 1.5px solid rgba(0, 150, 255, 0.3); /* 原1px → 翻倍至2px */
+        }
+
+        .modal-title {
+            font-size: 2.4rem; /* 原1.6rem → 翻倍至3.2rem */
+            color: #00ccff;
+            font-weight: 600;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: #a0cfff;
+            font-size: 2.25rem; /* 原1.5rem → 翻倍至3rem */
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .modal-close:hover {
+            color: #ffffff;
+        }
+
+        .modal-body {
+            color: #a0d0ff;
+            line-height: 1.8;
+            margin-bottom: 38px; /* 原25px → 翻倍至50px */
+            font-size: 1.6rem; /* 原1.1rem → 翻倍至2.2rem */
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .modal-btn {
+            background: rgba(0, 120, 215, 0.3);
+            border: 1.5px solid rgba(0, 150, 255, 0.5); /* 原1px → 翻倍至2px */
+            color: #a0d0ff;
+            padding: 15px 30px; /* 原10px 20px → 翻倍至20px 40px */
+            border-radius: 9px; /* 原6px → 翻倍至12px */
+            font-size: 1.5rem; /* 原1rem → 翻倍至2rem */
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .modal-btn:hover {
+            background: rgba(0, 150, 255, 0.5);
+            color: #ffffff;
+        }
+
+        .modal-body img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px; /* 原8px → 翻倍至16px */
+            box-shadow: 0 6px 23px rgba(0, 0, 0, 0.3); /* 阴影范围翻倍 */
+            margin-bottom: 23px; /* 原15px → 翻倍至30px */
         }
 
         /* 动画效果 */
@@ -231,7 +373,7 @@
         /* 响应式调整 */
         @media (max-width: 1200px) {
             .dashboard {
-                grid-template-columns: 1fr 1fr;
+                grid-template-columns: 0.5fr 1.5fr; /* 保持比例缩小左侧 */
             }
 
             .video-section {
@@ -266,6 +408,83 @@
             .header h1 {
                 font-size: 2rem;
             }
+
+            .btn-expand {
+                width: 25px; /* 进一步缩小 */
+                height: 25px;
+            }
+        }
+
+        /* 欢迎对话框样式 */
+        .welcome-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.9);
+            background: rgba(10, 20, 40, 0.95);
+            border-radius: 12px;
+            padding: 30px;
+            width: 90%;
+            max-width: 400px;
+            border: 2px solid rgba(0, 167, 255, 0.7);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            z-index: 2000; /* 确保在浮动按钮之上 */
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        .welcome-modal.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .welcome-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(0, 167, 255, 0.3);
+        }
+
+        .welcome-title {
+            font-size: 1.5rem;
+            color: #00ccff;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .welcome-close {
+            background: none;
+            border: none;
+            color: #a0cfff;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .welcome-close:hover {
+            color: #ffffff;
+        }
+
+        .welcome-body {
+            color: #a0d0ff;
+            line-height: 1.8;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        .welcome-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: block;
+            border: 3px solid rgba(0, 167, 255, 0.5);
         }
     </style>
 </head>
@@ -284,22 +503,40 @@
 
     <!-- 主仪表盘 -->
     <main class="dashboard">
-        <!-- 左侧数据面板 -->
+        <!-- 左侧数据面板（已缩小） -->
         <div class="panel panel-left">
             <div class="panel-title">
-                <i class="fas fa-chart-line"></i>
-                球员数据统计
+                <i class="fas fa-cogs"></i>
+                系统功能
             </div>
-            <div class="panel-content">
-                <div class="placeholder">
-                    <i class="fas fa-user-chart"></i>
-                    <p>球员数据统计面板</p>
-                    <p>（等待数据接入）</p>
-                </div>
+            <div class="panel-content" style="display: flex; flex-direction: column; padding: 0;">
+                <!-- 按钮1 -->
+                <button id="btn1" class="btn-expand" style="background: #0072ff; color: white; box-shadow: 0 0 10px rgba(0, 114, 255, 0.4);">
+                    <i class="fa fa-fire mr-2" style="color: #ff4444; font-size: 1.8rem;"></i>
+                    <span class="btn-text">热力图</span>
+                </button>
+                
+                <!-- 按钮2 -->
+                <button id="btn2" class="btn-expand" style="background: #00c6ff; color: white; box-shadow: 0 0 10px rgba(0, 198, 255, 0.4);">
+                    <i class="fa fa-eye mr-2" style="color: #180202; font-size: 1.8rem;"></i>
+                    <span class="btn-text">鸟瞰图</span>
+                </button>
+                
+                <!-- 按钮3 -->
+                <button id="btn3" class="btn-expand" style="background: #00ffcc; color: #0a1a30; box-shadow: 0 0 10px rgba(0, 255, 204, 0.4);">
+                    <i class="fa fa-pie-chart mr-2" style="color: #00C851; font-size: 1.8rem;"></i>
+                    <span class="btn-text">饼图</span>
+                </button>
+                
+                <!-- 按钮4 -->
+                <button id="btn4" class="btn-expand" style="background: #ff6666; color: white; box-shadow: 0 0 10px rgba(255, 102, 102, 0.4);">
+                    <i class="fa fa-line-chart mr-2" style="color: #ffbb33; font-size: 1.8rem;"></i>
+                    <span class="btn-text">加速度图</span>
+                </button>
             </div>
         </div>
 
-        <!-- 中间视频区域 -->
+        <!-- 中间视频区域（已放大） -->
         <div class="video-section">
             <div class="camera-container">
                 <div class="camera-feed" id="camera-feed">
@@ -340,9 +577,6 @@
                     <i class="fas fa-expand"></i> 全屏
                 </button>
             </div>
-
-
-
         </div>
 
         <!-- 右侧分析面板 -->
@@ -360,8 +594,130 @@
             </div>
         </div>
     </main>
+    <!-- 浮动按钮 -->
+    <img id="floating-btn" src="/static/tennis_prince.jpg" alt="网球王子" 
+        style="position: fixed; left: 20px; bottom: 20px; width: 80px; height: 80px; border-radius: 50%; 
+                cursor: move; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: transform 0.2s;">
+
+    <!-- 欢迎对话框 -->
+    <div class="welcome-modal" id="welcomeModal">
+        <div class="welcome-header">
+            <h3 class="welcome-title">
+                <i class="fas fa-tennis-ball"></i> 网球王子
+            </h3>
+            <button class="welcome-close" id="welcomeClose">&times;</button>
+        </div>
+        <div class="welcome-body">
+            <img src="/static/tennis_prince.jpg" alt="网球王子" class="welcome-avatar">
+            <p>您好！我是网球王子，专注于网球训练数据分析。有任何关于网球训练的问题，都可以问我哦！</p>
+        </div>
+    </div>
+
+    <!-- 模态框1：热力图 -->
+    <div id="modal1" class="modal-backdrop">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fa fa-fire mr-2"></i>热力图分析</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <img src="https://picsum.photos/800/400?random=1" alt="网球击球热力图" class="w-full h-auto rounded-lg mb-4">
+                <p>热力图显示了球员在网球场上的活动频率和击球热点区域。颜色越红表示该区域活动或击球次数越多，有助于分析球员的偏好区域和战术模式。</p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn close-modal">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模态框2：鸟瞰图 -->
+    <div id="modal2" class="modal-backdrop">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fa fa-eye mr-2"></i>鸟瞰图分析</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <img src="https://picsum.photos/800/400?random=2" alt="网球场地鸟瞰图" class="w-full h-auto rounded-lg mb-4">
+                <p>鸟瞰图展示了球员在整个网球场上的移动轨迹和位置分布。通过分析轨迹密度和覆盖范围，可以评估球员的防守范围、移动效率和战术跑位。</p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn close-modal">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模态框3：饼图 -->
+    <div id="modal3" class="modal-backdrop">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fa fa-pie-chart mr-2"></i>击球类型分析</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <img src="https://picsum.photos/800/400?random=3" alt="网球击球类型饼图" class="w-full h-auto rounded-lg mb-4">
+                <p>饼图直观展示了球员各种击球类型的分布比例，包括正手、反手、截击、高压等。通过分析饼图，可以了解球员的技术优势和弱点，优化训练重点。</p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn close-modal">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模态框4：加速度图 -->
+    <div id="modal4" class="modal-backdrop">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fa fa-line-chart mr-2"></i>加速度分析</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <img src="https://picsum.photos/800/400?random=4" alt="网球挥拍加速度图" class="w-full h-auto rounded-lg mb-4">
+                <p>加速度图显示了球员在击球过程中的挥拍加速度变化。通过分析峰值加速度、加速度曲线形态，可以评估击球力量、节奏控制和技术效率。</p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn close-modal">关闭</button>
+            </div>
+        </div>
+    </div>
 
     <script>
+        // 浮动按钮功能
+        const floatingBtn = document.getElementById('floating-btn');
+        let isDragging = false;
+        let offsetX, offsetY;
+        let hasMoved = false; // 标记是否移动过
+
+        // 鼠标按下事件
+        floatingBtn.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            hasMoved = false;
+            offsetX = e.clientX - floatingBtn.getBoundingClientRect().left;
+            offsetY = e.clientY - floatingBtn.getBoundingClientRect().top;
+            floatingBtn.style.cursor = 'grabbing';
+        });
+
+        // 鼠标移动事件
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                hasMoved = true;
+                floatingBtn.style.left = (e.clientX - offsetX) + 'px';
+                floatingBtn.style.bottom = (window.innerHeight - e.clientY + offsetY) + 'px';
+            }
+        });
+
+        // 鼠标释放事件
+        document.addEventListener('mouseup', () => {
+            if (isDragging) {
+                isDragging = false;
+                floatingBtn.style.cursor = 'move';
+                
+                // 如果没有移动过（即点击），则跳转页面
+                if (!hasMoved) {
+                    window.location.href = '/ai.html'; // 通过后端路由跳转
+                }
+            }
+        });
         // 更新时间显示
         function updateDateTime() {
             const now = new Date();
@@ -451,6 +807,84 @@
 
         // 绑定"重新连接"按钮事件
         document.getElementById('connect-btn').addEventListener('click', connectStream);
+
+        // 模态框控制
+        const buttons = [
+            document.getElementById('btn1'),
+            document.getElementById('btn2'),
+            document.getElementById('btn3'),
+            document.getElementById('btn4')
+        ];
+        
+        const modals = [
+            document.getElementById('modal1'),
+            document.getElementById('modal2'),
+            document.getElementById('modal3'),
+            document.getElementById('modal4')
+        ];
+        
+        // 打开模态框
+        buttons.forEach((btn, index) => {
+            btn.addEventListener('click', () => {
+                modals[index].classList.add('active');
+                document.body.style.overflow = 'hidden'; // 防止背景滚动
+            });
+        });
+        
+        // 关闭模态框
+        function closeModal(modal) {
+            modal.classList.remove('active');
+            document.body.style.overflow = ''; // 恢复背景滚动
+        }
+        
+        // 关闭按钮事件
+        document.querySelectorAll('.close-modal, .modal-close').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const modal = e.target.closest('.modal-backdrop');
+                if (modal) closeModal(modal);
+            });
+        });
+        
+        // 点击背景关闭
+        modals.forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal(modal);
+                }
+            });
+        });
+        
+        // ESC键关闭
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                modals.forEach(modal => {
+                    if (modal.classList.contains('active')) {
+                        closeModal(modal);
+                    }
+                });
+            }
+        });
+
+        // 欢迎对话框逻辑
+        document.addEventListener('DOMContentLoaded', () => {
+            const welcomeModal = document.getElementById('welcomeModal');
+            const welcomeClose = document.getElementById('welcomeClose');
+            
+            // 页面加载后显示对话框
+            setTimeout(() => {
+                welcomeModal.classList.add('active');
+            }, 500); // 延迟0.5秒显示，让页面有时间加载
+            
+            // 点击关闭按钮
+            welcomeClose.addEventListener('click', () => {
+                welcomeModal.classList.remove('active');
+            });
+            
+            // 自动关闭（5秒后）
+            setTimeout(() => {
+                welcomeModal.classList.remove('active');
+            }, 8000); // 8秒后自动关闭
+        });
     </script>
 </body>
 </html>
