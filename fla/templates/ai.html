@@ -380,8 +380,24 @@
                 }
             });
             
+            // 转义HTML特殊字符，防止XSS攻击
+            function escapeHTML(str) {
+                return str
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            }
+            
             // 添加消息到历史记录
             function addMessageToHistory(content, sender, isError = false) {
+                // 转义HTML特殊字符
+                let escapedContent = escapeHTML(content);
+                
+                // 将换行符(\n)转换为HTML换行标签(<br>)
+                const formattedContent = escapedContent.replace(/\n/g, '<br>');
+                
                 const messageDiv = document.createElement('div');
                 messageDiv.className = `flex items-start space-x-3 animate-fade-in`;
                 
@@ -389,7 +405,7 @@
                     messageDiv.className = 'flex items-start justify-end space-x-3';
                     messageDiv.innerHTML = `
                         <div class="bg-primary/20 rounded-lg rounded-tr-none p-4 max-w-[80%] border border-primary/30 ${isError ? 'border-danger/50 bg-danger/10' : ''}">
-                            <p>${content}</p>
+                            <p>${formattedContent}</p>
                         </div>
                         <div class="bg-secondary/20 p-2 rounded-full">
                             <i class="fa fa-user text-secondary"></i>
@@ -401,7 +417,7 @@
                             <i class="fa fa-robot text-primary"></i>
                         </div>
                         <div class="bg-dark/70 rounded-lg rounded-tl-none p-4 max-w-[80%] border border-primary/10 ${isError ? 'border-danger/50 bg-danger/10' : ''}">
-                            <p>${content}</p>
+                            <p>${formattedContent}</p>
                         </div>
                     `;
                 }
@@ -427,6 +443,9 @@
             
             // 初始化主题
             initTheme();
+            
+            // 添加初始消息
+            addMessageToHistory('嗨！我是网球王子，你的专属网球数据分析助手。请告诉我你的网球训练相关问题，我会尽力为你解答！', 'bot');
         });
     </script>
 </body>
