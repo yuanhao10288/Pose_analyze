@@ -107,6 +107,7 @@ evaluation_map = {
     }
 }
 
+
 # 动作类型判断（使用第4个时间点的8个角度）
 def classify_fore_back(angle_data, svm, scaler):
     arr = np.array(angle_data)
@@ -117,10 +118,12 @@ def classify_fore_back(angle_data, svm, scaler):
     feat_scaled = scaler.transform([feat])
     return "正手" if svm.predict(feat_scaled)[0] == 0 else "反手"
 
+
 # 计算 DTW 距离
 def dtw_distance(seq1, seq2):
     distance, _ = fastdtw(seq1, seq2, dist=lambda x, y: norm(np.array(x) - np.array(y)))
     return distance
+
 
 # 评分函数（根据正/反手标准对比）
 def score_shot(player_angles, player_accels, std_angles, std_accels):
@@ -138,7 +141,8 @@ def score_shot(player_angles, player_accels, std_angles, std_accels):
 
     total_dtw = angle_score + accel_score
     print(f"DTW 距离: {total_dtw}")  # 调试：打印 DTW 距离
-    return round(max(0, 100 * np.exp(-total_dtw / 300)), 2)  # 调整衰减系数（可尝试 /400）
+    return round(max(0, 100 * np.exp(-total_dtw / 300)), 2)  # 调整衰减系数
+
 
 # 使用OneClassSVM预测标签，异常评价基于训练集标准
 def predict_evaluation(svm_forehand, svm_backhand, scaler_forehand, scaler_backhand, angle_data, shot_type):
@@ -172,60 +176,78 @@ def predict_evaluation(svm_forehand, svm_backhand, scaler_forehand, scaler_backh
 
     return labels if labels else ["动作规范，技术到位"]
 
-# 数据读取
-def load_hit_moments(file_path):
-    all_data = []
-    with open(file_path, "r", encoding="utf-8") as f:
-        for line in f:
-            if not line.strip():
-                continue
-            try:
-                sample = ast.literal_eval(line.strip())
-                angles = sample[0]
-                accels = sample[1]
-                if len(np.array(angles).shape) == 1:
-                    angles = [angles]
-                angles = np.array(angles) % 180  # 模180处理，确保角度范围一致
-                all_data.append((angles, accels))
-            except Exception as e:
-                print(f"❌ 解析失败：{e}")
-    return all_data
 
-# 主程序入口
-def main():
-    data = load_hit_moments("hit_moments.txt")
-    output_file = "shot_evaluation.txt"  # 输出文件
+# 处理单个击球数据
+def process_hit(angles, accels):
+    try:
+        # 确保输入格式正确
+        angles = np.array(angles) % 180  # 模180处理
+        accels = np.array(accels)
 
-    with open(output_file, "w", encoding="utf-8") as f:
-        for i, (angles, accels) in enumerate(data, 1):
-            try:
-                shot_type = classify_fore_back(angles, shot_type_clf, shot_type_scaler)
-                if shot_type == "正手":
-                    std_angles = standard_body_angles_forehand
-                    std_accels = standard_acceleration_forehand
-                else:
-                    std_angles = standard_body_angles_backhand
-                    std_accels = standard_acceleration_backhand
+        # 获取当前击球ID
+        shot_id = 1
+        output_file = "shot_evaluation.txt"
+        if os.path.exists(output_file):
+            with open(output_file, "r", encoding="utf-8") as f:
+                lines = f.readlines()
+                if lines:
+                    last_line = lines[-1].strip().split(" ", 1)[0]
+                    shot_id = int(last_line) + 1 if last_line.isdigit() else 1
 
-                score = score_shot(angles, accels, std_angles, std_accels)
-                comments = predict_evaluation(
-                    oneclass_svm_forehand, oneclass_svm_backhand,
-                    oneclass_scaler_forehand, oneclass_scaler_backhand,
-                    angles, shot_type
-                )
+        # 分类击球类型
+        shot_type = classify_fore_back(angles, shot_type_clf, shot_type_scaler)
+        std_angles = standard_body_angles_forehand if shot_type == "正手" else standard_body_angles_backhand
+        std_accels = standard_acceleration_forehand if shot_type == "正手" else standard_acceleration_backhand
 
-                # 格式化评价
-                comment_str = "，".join(comments)
-                # 写入文件：id 评分 评价
-                f.write(f"{i} {score} {comment_str}\n")
+        # 计算评分
+        score = score_shot(angles, accels, std_angles, std_accels)
 
-                # 控制台输出（调试用）
-                print(f"第 {i} 个动作（{shot_type}）：评分 = {score}/100")
-                print(f"评价：{comment_str}")
-                print("-" * 50)
-            except Exception as e:
-                print(f"⚠️ 第 {i} 个动作处理失败：{e}")
-                f.write(f"{i} 0.0 处理失败：{e}\n")
+        # 生成评价
+        comments = predict_evaluation(
+            oneclass_svm_forehand, oneclass_svm_backhand,
+            oneclass_scaler_forehand, oneclass_scaler_backhand,
+            angles, shot_type
+        )
+
+        # 格式化评价
+        comment_str = "，".join(comments)
+
+        # 写入文件
+        with open(output_file, "a", encoding="utf-8") as f:
+            f.write(f"{shot_id} {score} {shot_type}：{comment_str}\n")
+
+        # 控制台输出
+        print(f"击球 {shot_id}（{shot_type}）：评分 = {score}/100")
+        print(f"评价：{comment_str}")
+        print("-" * 50)
+
+    except Exception as e:
+        print(f"⚠️ 击球处理失败：{e}")
+        with open(output_file, "a", encoding="utf-8") as f:
+            f.write(f"{shot_id} 0.0 处理失败：{e}\n")
+
 
 if __name__ == "__main__":
-    main()
+    # 批量处理（用于测试）
+    def load_hit_moments(file_path):
+        all_data = []
+        with open(file_path, "r", encoding="utf-8") as f:
+            for line in f:
+                if not line.strip():
+                    continue
+                try:
+                    sample = ast.literal_eval(line.strip())
+                    angles = sample[0]
+                    accels = sample[1]
+                    if len(np.array(angles).shape) == 1:
+                        angles = [angles]
+                    angles = np.array(angles) % 180
+                    all_data.append((angles, accels))
+                except Exception as e:
+                    print(f"❌ 解析失败：{e}")
+        return all_data
+
+
+    data = load_hit_moments("hit_moments.txt")
+    for i, (angles, accels) in enumerate(data, 1):
+        process_hit(angles, accels)

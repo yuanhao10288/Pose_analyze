@@ -1,5 +1,8 @@
 import ast
 import math
+import time
+import os
+from DTW import process_hit  # 导入 DTW 处理函数
 
 
 class SlidingWindow:
@@ -33,76 +36,78 @@ def process_hit_moment(pose_window, accel_window):
     print("处理击球瞬间数据：")
     print("Pose窗口完整数据:", pose_window)
     print("加速度窗口完整数据:", accel_window)
-    # 这里可以添加更多的处理逻辑，例如保存到文件或进行分析
-    # 为了演示，简单地将数据写入文件
-    with open("hit_moments.txt", "a") as output_file:
+    # 保存到文件
+    with open("hit_moments.txt", "a", encoding="utf-8") as output_file:
         output_data = [pose_window, accel_window]
         output_file.write(str(output_data) + "\n")
+    # 调用 DTW 进行评价
+    process_hit(pose_window, accel_window)
 
 
-def read_pose_data(file_path):
+def monitor_files(pose_file_path, accel_file_path):
     # 初始化滑动窗口
-    window = SlidingWindow(size=8)
-
-    try:
-        with open(file_path, "r") as file:
-            for line in file:
-                # 将字符串形式的数组转换为Python列表
-                data = ast.literal_eval(line.strip())
-                window.add_data(data)
-
-                # 打印当前窗口内容
-                print("Pose窗口内容:", window.get_window())
-
-                # 返回当前窗口内容以供同步使用
-                yield window.get_window()
-
-    except FileNotFoundError:
-        print(f"错误: 文件 {file_path} 未找到")
-    except Exception as e:
-        print(f"错误: {str(e)}")
-
-
-def read_acceleration_data(pose_file_path, accel_file_path):
-    # 初始化滑动窗口
+    pose_window = SlidingWindow(size=8)
     accel_window = SlidingWindow(size=8)
-    pose_generator = read_pose_data(pose_file_path)
 
-    try:
-        with open(accel_file_path, "r") as accel_file:
-            for line, pose_window in zip(accel_file, pose_generator):
-                # 将字符串形式的数组转换为Python列表
-                accel_data = ast.literal_eval(line.strip())
-                accel_window.add_data(accel_data)
+    # 文件偏移量，用于跟踪已读取的行
+    pose_offset = 0
+    accel_offset = 0
 
-                current_accel_window = accel_window.get_window()
-                print("加速度窗口内容:", current_accel_window)
+    while True:
+        try:
+            # 读取姿势数据
+            with open(pose_file_path, "r", encoding="utf-8") as pose_file:
+                pose_file.seek(pose_offset)
+                new_pose_lines = pose_file.readlines()
+                pose_offset = pose_file.tell()
 
-                # 当加速度窗口满8个数据时，检查击球瞬间
-                if len(current_accel_window) == 8 and len(pose_window) == 8:
-                    magnitudes = []
-                    for i in range(2, 5):  # 第3,4,5个数据（索引2,3,4）
-                        mag = calculate_magnitude(current_accel_window[i])
-                        magnitudes.append(mag)
-                        print(f"第{i + 1}个加速度数据的合加速度: {mag:.4f}")
+                # 读取加速度数据
+                with open(accel_file_path, "r", encoding="utf-8") as accel_file:
+                    accel_file.seek(accel_offset)
+                    new_accel_lines = accel_file.readlines()
+                    accel_offset = accel_file.tell()
 
-                    # 判断第4个数据是否为击球瞬间
-                    if magnitudes[1] == max(magnitudes):
-                        print("检测到击球瞬间！(第4个数据合加速度为峰值)")
-                        # 调用处理函数，传入两个窗口的完整数据
-                        process_hit_moment(pose_window, current_accel_window)
-                    else:
-                        print("未检测到击球瞬间。")
+                    # 同步处理，确保两文件行数一致
+                    for pose_line, accel_line in zip(new_pose_lines, new_accel_lines):
+                        try:
+                            pose_data = ast.literal_eval(pose_line.strip())
+                            accel_data = ast.literal_eval(accel_line.strip())
 
-    except FileNotFoundError:
-        print(f"错误: 文件 {accel_file_path} 或 {pose_file_path} 未找到")
-    except Exception as e:
-        print(f"错误: {str(e)}")
+                            pose_window.add_data(pose_data)
+                            accel_window.add_data(accel_data)
+
+                            current_pose_window = pose_window.get_window()
+                            current_accel_window = accel_window.get_window()
+
+                            print("Pose窗口内容:", current_pose_window)
+                            print("加速度窗口内容:", current_accel_window)
+
+                            # 当窗口满8个数据时，检查击球瞬间
+                            if len(current_pose_window) == 8 and len(current_accel_window) == 8:
+                                magnitudes = []
+                                for i in range(2, 5):  # 第3,4,5个数据（索引2,3,4）
+                                    mag = calculate_magnitude(current_accel_window[i])
+                                    magnitudes.append(mag)
+                                    print(f"第{i + 1}个加速度数据的合加速度: {mag:.4f}")
+
+                                # 判断第4个数据是否为击球瞬间
+                                if magnitudes and magnitudes[1] == max(magnitudes):
+                                    print("检测到击球瞬间！(第4个数据合加速度为峰值)")
+                                    process_hit_moment(current_pose_window, current_accel_window)
+                                else:
+                                    print("未检测到击球瞬间。")
+
+                        except Exception as e:
+                            print(f"解析数据失败: {e}")
+
+            time.sleep(0.1)  # 每0.1秒检查一次新数据
+        except Exception as e:
+            print(f"监控文件错误: {e}")
+            time.sleep(1)  # 出错时稍作等待
 
 
-# 测试代码
 if __name__ == "__main__":
     pose_file_path = "pose_data.txt"
     accel_file_path = "tennis_acceleration_data.txt"
-    print("处理pose和加速度数据：")
-    read_acceleration_data(pose_file_path, accel_file_path)
+    print("开始监控pose和加速度数据文件...")
+    monitor_files(pose_file_path, accel_file_path)

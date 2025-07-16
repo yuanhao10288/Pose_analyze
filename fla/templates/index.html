@@ -218,6 +218,34 @@
             color: rgba(0, 180, 255, 0.5);
         }
 
+        /* 右侧分析面板 - 新增滚动和列表样式 */
+        .panel-right .panel-content {
+            flex-direction: column;
+            align-items: center; /* 改为 center，使内容水平居中 */
+            overflow-y: auto;
+            max-height: calc(100vh - 200px);
+        }
+
+        .shot-evaluation {
+            background: rgba(0, 30, 60, 0.7);
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            width: 100%;
+            border: 1px solid rgba(0, 150, 255, 0.3);
+        }
+
+        .shot-evaluation h4 {
+            color: #00ccff;
+            margin-bottom: 5px;
+        }
+
+        .shot-evaluation p {
+            color: #a0d0ff;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
         /* 按钮样式 - 大小减半 */
         .btn-expand {
             width: 60px; /* 原60px */
@@ -231,18 +259,18 @@
             margin: 10px auto; /* 间距缩小 */
             border: none;
         }
-        
+
         .btn-expand:hover {
             width: 90%;
             border-radius: 30px; /* 原30px */
         }
-        
+
         .btn-expand:hover .btn-text {
             opacity: 1;
             width: auto;
             padding-left: 15px; /* 原15px */
         }
-        
+
         .btn-text {
             opacity: 0;
             width: 0;
@@ -515,19 +543,19 @@
                     <i class="fa fa-fire mr-2" style="color: #ff4444; font-size: 1.8rem;"></i>
                     <span class="btn-text">热力图</span>
                 </button>
-                
+
                 <!-- 按钮2 -->
                 <button id="btn2" class="btn-expand" style="background: #00c6ff; color: white; box-shadow: 0 0 10px rgba(0, 198, 255, 0.4);">
                     <i class="fa fa-eye mr-2" style="color: #180202; font-size: 1.8rem;"></i>
                     <span class="btn-text">鸟瞰图</span>
                 </button>
-                
+
                 <!-- 按钮3 -->
                 <button id="btn3" class="btn-expand" style="background: #00ffcc; color: #0a1a30; box-shadow: 0 0 10px rgba(0, 255, 204, 0.4);">
                     <i class="fa fa-pie-chart mr-2" style="color: #00C851; font-size: 1.8rem;"></i>
                     <span class="btn-text">饼图</span>
                 </button>
-                
+
                 <!-- 按钮4 -->
                 <button id="btn4" class="btn-expand" style="background: #ff6666; color: white; box-shadow: 0 0 10px rgba(255, 102, 102, 0.4);">
                     <i class="fa fa-line-chart mr-2" style="color: #ffbb33; font-size: 1.8rem;"></i>
@@ -585,7 +613,7 @@
                 <i class="fas fa-brain"></i>
                 AI分析结果
             </div>
-            <div class="panel-content">
+            <div class="panel-content" id="evaluation-list">
                 <div class="placeholder">
                     <i class="fas fa-robot"></i>
                     <p>实时分析结果面板</p>
@@ -595,8 +623,8 @@
         </div>
     </main>
     <!-- 浮动按钮 -->
-    <img id="floating-btn" src="/static/tennis_prince.jpg" alt="网球王子" 
-        style="position: fixed; left: 20px; bottom: 20px; width: 80px; height: 80px; border-radius: 50%; 
+    <img id="floating-btn" src="/static/tennis_prince.jpg" alt="网球王子"
+        style="position: fixed; left: 20px; bottom: 20px; width: 80px; height: 80px; border-radius: 50%;
                 cursor: move; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.5); transition: transform 0.2s;">
 
     <!-- 欢迎对话框 -->
@@ -605,7 +633,7 @@
             <h3 class="welcome-title">
                 <i class="fas fa-tennis-ball"></i> 网球王子
             </h3>
-            <button class="welcome-close" id="welcomeClose">&times;</button>
+            <button class="welcome-close" id="welcomeClose">×</button>
         </div>
         <div class="welcome-body">
             <img src="/static/tennis_prince.jpg" alt="网球王子" class="welcome-avatar">
@@ -618,7 +646,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title"><i class="fa fa-fire mr-2"></i>热力图分析</h3>
-                <button class="modal-close">&times;</button>
+                <button class="modal-close">×</button>
             </div>
             <div class="modal-body">
                 <img src="https://picsum.photos/800/400?random=1" alt="网球击球热力图" class="w-full h-auto rounded-lg mb-4">
@@ -635,7 +663,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title"><i class="fa fa-eye mr-2"></i>鸟瞰图分析</h3>
-                <button class="modal-close">&times;</button>
+                <button class="modal-close">×</button>
             </div>
             <div class="modal-body">
                 <img src="https://picsum.photos/800/400?random=2" alt="网球场地鸟瞰图" class="w-full h-auto rounded-lg mb-4">
@@ -652,7 +680,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title"><i class="fa fa-pie-chart mr-2"></i>击球类型分析</h3>
-                <button class="modal-close">&times;</button>
+                <button class="modal-close">×</button>
             </div>
             <div class="modal-body">
                 <img src="https://picsum.photos/800/400?random=3" alt="网球击球类型饼图" class="w-full h-auto rounded-lg mb-4">
@@ -669,7 +697,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h3 class="modal-title"><i class="fa fa-line-chart mr-2"></i>加速度分析</h3>
-                <button class="modal-close">&times;</button>
+                <button class="modal-close">×</button>
             </div>
             <div class="modal-body">
                 <img src="https://picsum.photos/800/400?random=4" alt="网球挥拍加速度图" class="w-full h-auto rounded-lg mb-4">
@@ -711,13 +739,14 @@
             if (isDragging) {
                 isDragging = false;
                 floatingBtn.style.cursor = 'move';
-                
+
                 // 如果没有移动过（即点击），则跳转页面
                 if (!hasMoved) {
                     window.location.href = '/ai.html'; // 通过后端路由跳转
                 }
             }
         });
+
         // 更新时间显示
         function updateDateTime() {
             const now = new Date();
@@ -815,14 +844,14 @@
             document.getElementById('btn3'),
             document.getElementById('btn4')
         ];
-        
+
         const modals = [
             document.getElementById('modal1'),
             document.getElementById('modal2'),
             document.getElementById('modal3'),
             document.getElementById('modal4')
         ];
-        
+
         // 打开模态框
         buttons.forEach((btn, index) => {
             btn.addEventListener('click', () => {
@@ -830,13 +859,13 @@
                 document.body.style.overflow = 'hidden'; // 防止背景滚动
             });
         });
-        
+
         // 关闭模态框
         function closeModal(modal) {
             modal.classList.remove('active');
             document.body.style.overflow = ''; // 恢复背景滚动
         }
-        
+
         // 关闭按钮事件
         document.querySelectorAll('.close-modal, .modal-close').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -844,7 +873,7 @@
                 if (modal) closeModal(modal);
             });
         });
-        
+
         // 点击背景关闭
         modals.forEach(modal => {
             modal.addEventListener('click', (e) => {
@@ -853,7 +882,7 @@
                 }
             });
         });
-        
+
         // ESC键关闭
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
@@ -869,21 +898,66 @@
         document.addEventListener('DOMContentLoaded', () => {
             const welcomeModal = document.getElementById('welcomeModal');
             const welcomeClose = document.getElementById('welcomeClose');
-            
+
             // 页面加载后显示对话框
             setTimeout(() => {
                 welcomeModal.classList.add('active');
             }, 500); // 延迟0.5秒显示，让页面有时间加载
-            
+
             // 点击关闭按钮
             welcomeClose.addEventListener('click', () => {
                 welcomeModal.classList.remove('active');
             });
-            
+
             // 自动关闭（5秒后）
             setTimeout(() => {
                 welcomeModal.classList.remove('active');
             }, 8000); // 8秒后自动关闭
+
+            // 实时获取击球评价
+            function fetchEvaluations() {
+                fetch('/api/evaluations')
+                    .then(response => response.json())
+                    .then(data => {
+                        const evaluationList = document.getElementById('evaluation-list');
+                        evaluationList.innerHTML = ''; // 清空现有内容
+                        if (data.evaluations && data.evaluations.length > 0) {
+                            data.evaluations.forEach(eval => {
+                                const evalDiv = document.createElement('div');
+                                evalDiv.className = 'shot-evaluation';
+                                evalDiv.innerHTML = `
+                                    <h4>击球 ${eval.id} (${eval.shot_type}) - 评分: ${eval.score}/100</h4>
+                                    <p>${eval.comments}</p>
+                                `;
+                                evaluationList.appendChild(evalDiv);
+                            });
+                            // 自动滚动到最新评价
+                            evaluationList.scrollTop = evaluationList.scrollHeight;
+                        } else {
+                            evaluationList.innerHTML = `
+                                <div class="placeholder">
+                                    <i class="fas fa-robot"></i>
+                                    <p>实时分析结果面板</p>
+                                    <p>（等待数据处理）</p>
+                                </div>
+                            `;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('获取评价失败:', error);
+                        document.getElementById('evaluation-list').innerHTML = `
+                            <div class="placeholder">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <p>加载评价失败</p>
+                                <p>请检查服务状态</p>
+                            </div>
+                        `;
+                    });
+            }
+
+            // 每2秒轮询一次
+            fetchEvaluations();
+            setInterval(fetchEvaluations, 2000);
         });
     </script>
 </body>

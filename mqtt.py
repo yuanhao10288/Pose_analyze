@@ -1,6 +1,7 @@
 import paho.mqtt.client as mqtt
 import json
 import time
+import os
 
 # MQTT 服务器配置
 MQTT_BROKER = "me90f19a.ala.cn-hangzhou.emqxsl.cn"
@@ -10,17 +11,21 @@ MQTT_GESTURE_TOPIC = "gesture"
 MQTT_USERNAME = "Esp8266"
 MQTT_PASSWORD = "Esp8266"
 
-# 存储数据的列表
-acceleration_data = []
-gesture_data = []
+# 文件路径
+ACCEL_FILE = "tennis_acceleration_data.txt"
+POSE_FILE = "pose_data.txt"
 
+# 确保文件存在
+if not os.path.exists(ACCEL_FILE):
+    open(ACCEL_FILE, "a").close()
+if not os.path.exists(POSE_FILE):
+    open(POSE_FILE, "a").close()
 
 # 回调函数：连接成功时触发
 def on_connect(client, userdata, flags, rc):
     print("Connected to MQTT Broker with result code: " + str(rc))
     # 订阅加速度和姿势主题
     client.subscribe([(MQTT_ACC_TOPIC, 0), (MQTT_GESTURE_TOPIC, 0)])
-
 
 # 回调函数：接收到消息时触发
 def on_message(client, userdata, msg):
@@ -38,38 +43,33 @@ def on_message(client, userdata, msg):
 
             print(f"Received Acceleration - AccX: {acc_x}, AccY: {acc_y}, AccZ: {acc_z}")
 
-            acceleration_data.append({
-                "timestamp": timestamp,
-                "accX": acc_x,
-                "accY": acc_y,
-                "accZ": acc_z
-            })
+            # 保存到文件
+            with open(ACCEL_FILE, "a", encoding="utf-8") as f:
+                f.write(f"[{acc_x}, {acc_y}, {acc_z}]\n")
 
         elif msg.topic == MQTT_GESTURE_TOPIC:
             # 处理姿势数据（八个身体角度）
-            angles = {
-                "angle1": data.get("angle1", 0),
-                "angle2": data.get("angle2", 0),
-                "angle3": data.get("angle3", 0),
-                "angle4": data.get("angle4", 0),
-                "angle5": data.get("angle5", 0),
-                "angle6": data.get("angle6", 0),
-                "angle7": data.get("angle7", 0),
-                "angle8": data.get("angle8", 0)
-            }
+            angles = [
+                data.get("angle1", 0),
+                data.get("angle2", 0),
+                data.get("angle3", 0),
+                data.get("angle4", 0),
+                data.get("angle5", 0),
+                data.get("angle6", 0),
+                data.get("angle7", 0),
+                data.get("angle8", 0)
+            ]
 
             print(f"Received Gesture - Angles: {angles}")
 
-            gesture_data.append({
-                "timestamp": timestamp,
-                **angles
-            })
+            # 保存到文件
+            with open(POSE_FILE, "a", encoding="utf-8") as f:
+                f.write(f"{angles}\n")
 
     except json.JSONDecodeError:
         print("Error: Failed to decode JSON data")
     except Exception as e:
         print(f"Error: {str(e)}")
-
 
 # 初始化 MQTT 客户端
 client = mqtt.Client()
