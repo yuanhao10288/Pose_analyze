@@ -310,13 +310,17 @@
         .modal-content {
             background: rgba(10, 20, 40, 0.95);
             border-radius: 18px; /* 原12px → 翻倍至24px */
-            max-width: 750px; /* 原500px → 翻倍至1000px */
-            width: 90%;
-            padding: 38px; /* 原25px → 翻倍至50px */
+            max-width: 95vw; /* 调整为视口宽度百分比 */
+            max-height: 90vh; /* 限制最大高度 */
+            width: 95vw; /* 调整为视口宽度百分比 */
+            padding: 20px; /* 减少内边距 */
             border: 1.5px solid rgba(0, 150, 255, 0.5); /* 原1px → 翻倍至2px */
             box-shadow: 0 15px 60px rgba(0, 0, 0, 0.5); /* 阴影范围翻倍 */
             transform: scale(0.9);
             transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
         .modal-backdrop.active .modal-content {
@@ -327,13 +331,13 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px; /* 原20px → 翻倍至40px */
-            padding-bottom: 15px; /* 原10px → 翻倍至20px */
+            margin-bottom: 15px; /* 减少间距 */
+            padding-bottom: 10px; /* 减少间距 */
             border-bottom: 1.5px solid rgba(0, 150, 255, 0.3); /* 原1px → 翻倍至2px */
         }
 
         .modal-title {
-            font-size: 2.4rem; /* 原1.6rem → 翻倍至3.2rem */
+            font-size: 1.8rem; /* 减小字体大小 */
             color: #00ccff;
             font-weight: 600;
         }
@@ -342,7 +346,7 @@
             background: none;
             border: none;
             color: #a0cfff;
-            font-size: 2.25rem; /* 原1.5rem → 翻倍至3rem */
+            font-size: 1.8rem; /* 减小字体大小 */
             cursor: pointer;
             transition: color 0.2s;
         }
@@ -353,23 +357,27 @@
 
         .modal-body {
             color: #a0d0ff;
-            line-height: 1.8;
-            margin-bottom: 38px; /* 原25px → 翻倍至50px */
-            font-size: 1.6rem; /* 原1.1rem → 翻倍至2.2rem */
+            line-height: 1.6;
+            margin-bottom: 20px; /* 减少间距 */
+            font-size: 1.3rem; /* 减小字体大小 */
+            overflow-y: auto;
+            flex: 1;
+            padding: 5px;
         }
 
         .modal-footer {
             display: flex;
             justify-content: flex-end;
+            padding-top: 15px;
         }
 
         .modal-btn {
             background: rgba(0, 120, 215, 0.3);
             border: 1.5px solid rgba(0, 150, 255, 0.5); /* 原1px → 翻倍至2px */
             color: #a0d0ff;
-            padding: 15px 30px; /* 原10px 20px → 翻倍至20px 40px */
+            padding: 12px 25px; /* 减小按钮大小 */
             border-radius: 9px; /* 原6px → 翻倍至12px */
-            font-size: 1.5rem; /* 原1rem → 翻倍至2rem */
+            font-size: 1.3rem; /* 减小字体大小 */
             cursor: pointer;
             transition: all 0.3s;
         }
@@ -384,7 +392,7 @@
             height: auto;
             border-radius: 12px; /* 原8px → 翻倍至16px */
             box-shadow: 0 6px 23px rgba(0, 0, 0, 0.3); /* 阴影范围翻倍 */
-            margin-bottom: 23px; /* 原15px → 翻倍至30px */
+            margin-bottom: 15px; /* 减小间距 */
         }
 
         /* 动画效果 */
@@ -514,6 +522,176 @@
             display: block;
             border: 3px solid rgba(0, 167, 255, 0.5);
         }
+
+        /* 训练总结样式 */
+        .chart-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px; /* 减小间隙 */
+            margin-bottom: 20px;
+        }
+
+        .chart-item {
+            background: rgba(0, 30, 60, 0.5);
+            padding: 12px; /* 减小内边距 */
+            border-radius: 8px;
+            border: 1px solid rgba(0, 150, 255, 0.3);
+            text-align: center;
+        }
+
+        .chart-item h4 {
+            color: #00ccff;
+            margin-bottom: 10px;
+            font-size: 1.2rem; /* 减小字体大小 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chart-img {
+            width: 100%;
+            height: 120px; /* 减小高度 */
+            object-fit: cover;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+
+        .training-summary {
+            background: rgba(0, 30, 60, 0.7);
+            padding: 15px; /* 减小内边距 */
+            border-radius: 8px;
+            border: 1px solid rgba(0, 150, 255, 0.3);
+        }
+
+        .progress-bars {
+            margin: 15px 0; /* 减小间距 */
+        }
+
+        .progress-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px; /* 减小间距 */
+        }
+
+        .progress-item span:first-child {
+            width: 100px; /* 减小宽度 */
+            text-align: right;
+            padding-right: 10px;
+            color: #a0d0ff;
+            font-size: 1.1rem; /* 减小字体大小 */
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 10px; /* 减小高度 */
+            background: rgba(100, 150, 200, 0.2);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 5px;
+        }
+
+        .progress-item span:last-child {
+            width: 40px; /* 减小宽度 */
+            text-align: right;
+            color: #00ffcc;
+            font-weight: bold;
+            font-size: 1.1rem; /* 减小字体大小 */
+        }
+
+        .recommendations ul {
+            padding-left: 20px; /* 减小内边距 */
+            margin-top: 8px; /* 减小间距 */
+        }
+
+        .recommendations li {
+            margin-bottom: 6px; /* 减小间距 */
+            color: #a0d0ff;
+            line-height: 1.4;
+            font-size: 1.1rem; /* 减小字体大小 */
+        }
+
+        /* 新布局样式 - 横向排列 */
+        .summary-container {
+            display: flex;
+            gap: 20px; /* 减小间隙 */
+            margin-bottom: 20px;
+        }
+
+        .charts-section {
+            flex: 1.5;
+        }
+
+        .analysis-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .training-summary {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .summary-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .stat-box {
+            flex: 1;
+            min-width: 120px;
+            background: rgba(0, 50, 100, 0.5);
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid rgba(0, 150, 255, 0.3);
+        }
+
+        .stat-value {
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: #00ffcc;
+            margin: 5px 0;
+        }
+
+        .stat-label {
+            font-size: 1.1rem;
+            color: #a0d0ff;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 992px) {
+            .summary-container {
+                flex-direction: column;
+            }
+            
+            .modal-content {
+                max-width: 98vw;
+                width: 98vw;
+                max-height: 95vh;
+            }
+            
+            .chart-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .modal-title {
+                font-size: 1.5rem;
+            }
+            
+            .summary-stats {
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
 <body>
@@ -594,15 +772,19 @@
                 </div>
             </div>
 
-            <div class="camera-controls" style="display: flex; gap: 15px;">
-                <button class="camera-btn" id="connect-btn" style="flex:1; background: rgba(0, 120, 215, 0.3); border: 1px solid rgba(0, 150, 255, 0.5); color: #a0d0ff; padding: 12px; border-radius: 8px; font-size: 1.1rem; cursor: pointer; transition: all 0.3s;">
+            <div class="camera-controls" style="display: flex; gap: 15px; flex-wrap: wrap;">
+                <button class="camera-btn" id="connect-btn" style="flex:1; min-width: 150px; background: rgba(0, 120, 215, 0.3); border: 1px solid rgba(0, 150, 255, 0.5); color: #a0d0ff; padding: 12px; border-radius: 8px; font-size: 1.1rem; cursor: pointer; transition: all 0.3s;">
                     <i class="fas fa-sync-alt"></i> 重新连接
                 </button>
-                <button class="camera-btn" style="flex:1; background: rgba(0, 120, 215, 0.3); border: 1px solid rgba(0, 150, 255, 0.5); color: #a0d0ff; padding: 12px; border-radius: 8px; font-size: 1.1rem; cursor: pointer; transition: all 0.3s;">
+                <button class="camera-btn" style="flex:1; min-width: 150px; background: rgba(0, 120, 215, 0.3); border: 1px solid rgba(0, 150, 255, 0.5); color: #a0d0ff; padding: 12px; border-radius: 8px; font-size: 1.1rem; cursor: pointer; transition: all 0.3s;">
                     <i class="fas fa-cog"></i> 设置
                 </button>
-                <button class="camera-btn" style="flex:1; background: rgba(0, 120, 215, 0.3); border: 1px solid rgba(0, 150, 255, 0.5); color: #a0d0ff; padding: 12px; border-radius: 8px; font-size: 1.1rem; cursor: pointer; transition: all 0.3s;">
+                <button class="camera-btn" style="flex:1; min-width: 150px; background: rgba(0, 120, 215, 0.3); border: 1px solid rgba(0, 150, 255, 0.5); color: #a0d0ff; padding: 12px; border-radius: 8px; font-size: 1.1rem; cursor: pointer; transition: all 0.3s;">
                     <i class="fas fa-expand"></i> 全屏
+                </button>
+                <!-- 添加结束训练按钮 -->
+                <button id="end-training-btn" class="camera-btn" style="flex:1; min-width: 150px; background: rgba(215, 40, 40, 0.3); border: 1px solid rgba(255, 100, 100, 0.5); color: #ffa0a0; padding: 12px; border-radius: 8px; font-size: 1.1rem; cursor: pointer; transition: all 0.3s;">
+                    <i class="fas fa-flag-checkered"></i> 结束训练
                 </button>
             </div>
         </div>
@@ -705,6 +887,115 @@
             </div>
             <div class="modal-footer">
                 <button class="modal-btn close-modal">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 训练总结模态框 -->
+    <div id="modal-summary" class="modal-backdrop">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-flag-checkered mr-2"></i>训练总结报告</h3>
+                <button class="modal-close">×</button>
+            </div>
+            <div class="modal-body">
+                <div class="summary-stats">
+                    <div class="stat-box">
+                        <div class="stat-value">45分钟</div>
+                        <div class="stat-label">训练时长</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value">286次</div>
+                        <div class="stat-label">总击球数</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value">82%</div>
+                        <div class="stat-label">平均成功率</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-value">125km/h</div>
+                        <div class="stat-label">最大速度</div>
+                    </div>
+                </div>
+                
+                <div class="summary-container">
+                    <div class="charts-section">
+                        <div class="chart-grid">
+                            <div class="chart-item">
+                                <h4><i class="fa fa-fire mr-2"></i>热力图</h4>
+                                <img src="https://picsum.photos/400/200?random=1" alt="网球击球热力图" class="chart-img">
+                                <p>击球热点区域分布：正手区活跃度较高</p>
+                            </div>
+                            <div class="chart-item">
+                                <h4><i class="fa fa-eye mr-2"></i>鸟瞰图</h4>
+                                <img src="https://picsum.photos/400/200?random=2" alt="网球场地鸟瞰图" class="chart-img">
+                                <p>全场覆盖范围：左侧区域移动较少</p>
+                            </div>
+                            <div class="chart-item">
+                                <h4><i class="fa fa-pie-chart mr-2"></i>击球类型</h4>
+                                <img src="https://picsum.photos/400/200?random=3" alt="网球击球类型饼图" class="chart-img">
+                                <p>正手：65% | 反手：25% | 截击：10%</p>
+                            </div>
+                            <div class="chart-item">
+                                <h4><i class="fa fa-line-chart mr-2"></i>加速度</h4>
+                                <img src="https://picsum.photos/400/200?random=4" alt="网球挥拍加速度图" class="chart-img">
+                                <p>最大挥拍速度：125 km/h</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="analysis-section">
+                        <div class="training-summary">
+                            <h4><i class="fas fa-chart-line mr-2"></i>技能分析</h4>
+                            <div class="progress-bars">
+                                <div class="progress-item">
+                                    <span>正手稳定性</span>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 85%; background: linear-gradient(90deg, #00c6ff, #0072ff);"></div>
+                                    </div>
+                                    <span>85%</span>
+                                </div>
+                                <div class="progress-item">
+                                    <span>反手控制</span>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 72%; background: linear-gradient(90deg, #00ffcc, #00C851);"></div>
+                                    </div>
+                                    <span>72%</span>
+                                </div>
+                                <div class="progress-item">
+                                    <span>移动效率</span>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 78%; background: linear-gradient(90deg, #ff9966, #ff5e62);"></div>
+                                    </div>
+                                    <span>78%</span>
+                                </div>
+                                <div class="progress-item">
+                                    <span>发球准确度</span>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 68%; background: linear-gradient(90deg, #aa66ff, #6610f2);"></div>
+                                    </div>
+                                    <span>68%</span>
+                                </div>
+                            </div>
+                            
+                            <div class="recommendations">
+                                <h5><i class="fas fa-lightbulb mr-2"></i>训练建议：</h5>
+                                <ul>
+                                    <li>加强反手击球练习，提高稳定性和控制力</li>
+                                    <li>增加左侧区域移动训练，改善覆盖范围</li>
+                                    <li>尝试不同角度截击练习，提高网前得分能力</li>
+                                    <li>优化发球动作，减少双误次数</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn close-modal">关闭</button>
+                <button id="save-report-btn" class="modal-btn" style="background: rgba(0, 150, 80, 0.3); border-color: rgba(0, 200, 100, 0.5);">
+                    <i class="fas fa-download"></i> 保存报告
+                </button>
             </div>
         </div>
     </div>
@@ -883,10 +1174,26 @@
             });
         });
 
-        // ESC键关闭
+        // 添加结束训练按钮事件
+        document.getElementById('end-training-btn').addEventListener('click', () => {
+            document.getElementById('modal-summary').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+
+        // 保存报告功能
+        document.getElementById('save-report-btn').addEventListener('click', () => {
+            alert('训练报告已保存！您可以在历史记录中查看。');
+            document.getElementById('modal-summary').classList.remove('active');
+            document.body.style.overflow = '';
+        });
+
+        // 将训练总结模态框添加到模态框列表
+        const allModals = [...modals, document.getElementById('modal-summary')];
+
+        // 更新ESC键关闭功能
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
-                modals.forEach(modal => {
+                allModals.forEach(modal => {
                     if (modal.classList.contains('active')) {
                         closeModal(modal);
                     }
