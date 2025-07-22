@@ -371,9 +371,8 @@
                         conversationCount = 0;
                         totalResponseTime = 0;
                         updateStats();
+                
                         
-                        // 添加初始消息
-                        addMessageToHistory('嗨！我是网球王子，你的专属网球数据分析助手。请告诉我你的网球训练相关问题，我会尽力为你解答！', 'bot');
                     } catch (error) {
                         console.error('Error clearing history:', error);
                     }
@@ -444,8 +443,6 @@
             // 初始化主题
             initTheme();
             
-            // 添加初始消息
-            addMessageToHistory('嗨！我是网球王子，你的专属网球数据分析助手。请告诉我你的网球训练相关问题，我会尽力为你解答！', 'bot');
         });
     </script>
 </body>

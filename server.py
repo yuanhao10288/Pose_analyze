@@ -22,7 +22,7 @@ latest_frame = None  # 存储最新帧的全局变量
 #树莓派信息传输配置
 
 # 树莓派IP地址和端口号，需根据实际情况修改
-url = "http://192.168.157.206:5000/receive_coordinate"
+# url = "http://192.168.157.206:5000/receive_coordinate"
 
 def calculate_angle(a, b, c):
     '''
@@ -206,13 +206,13 @@ while True:
         # test.append(
         #     [langle, rangle, lsangle, rsangle, lhangle, rhangle, lkangle, rkangle])
         test = [langle, rangle, lsangle, rsangle, lhangle, rhangle, lkangle, rkangle]
-        print(test)
+        # print(test)
 
-        coordinates = rwrist  # 假设这是要发送的坐标
-        data = {"x": coordinates[0], "y": coordinates[1]}
-        response = requests.post(url, json=data)
-        print(response.text)
-        print("右手腕坐标：",rwrist)
+        # coordinates = rwrist  # 假设这是要发送的坐标
+        # data = {"x": coordinates[0], "y": coordinates[1]}
+        # response = requests.post(url, json=data)
+        # print(response.text)
+        # print("右手腕坐标：",rwrist)
         # MQTT:构建要发布的数据
         gesture_data = {
             "timestamp": time.time(),
@@ -230,7 +230,7 @@ while True:
         }
 
         # 打印数据
-        print(json.dumps(gesture_data, indent=2))
+        # print(json.dumps(gesture_data, indent=2))
 
         # 控制发布频率
         current_time = time.time()
@@ -244,13 +244,13 @@ while True:
 
     latest_frame = frame
     # 显示帧
-    cv2.imshow('MJPG Stream', frame)
+    # cv2.imshow('MJPG Stream', frame)
 
     # 按'q'退出
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+    # if cv2.waitKey(1) & 0xFF == ord('q'):
+    #     break
 
 client.loop_stop()  # 停止MQTT循环线程
 client.disconnect()  # 断开MQTT连接
-cap.release()
-cv2.destroyAllWindows()
+# cap.release()
+# cv2.destroyAllWindows()

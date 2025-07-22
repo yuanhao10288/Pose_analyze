@@ -731,13 +731,19 @@
                 <!-- 按钮3 -->
                 <button id="btn3" class="btn-expand" style="background: #00ffcc; color: #0a1a30; box-shadow: 0 0 10px rgba(0, 255, 204, 0.4);">
                     <i class="fa fa-pie-chart mr-2" style="color: #00C851; font-size: 1.8rem;"></i>
-                    <span class="btn-text">饼图</span>
+                    <span class="btn-text">成绩统计图</span>
                 </button>
 
                 <!-- 按钮4 -->
                 <button id="btn4" class="btn-expand" style="background: #ff6666; color: white; box-shadow: 0 0 10px rgba(255, 102, 102, 0.4);">
                     <i class="fa fa-line-chart mr-2" style="color: #ffbb33; font-size: 1.8rem;"></i>
                     <span class="btn-text">加速度图</span>
+                </button>
+
+                <!-- 按钮5 -->
+                <button id="btn5" class="btn-expand" style="background: #aa66cc; color: white; box-shadow: 0 0 10px rgba(170, 102, 204, 0.4);">
+                    <i class="fa fa-random mr-2" style="color: #ffff00; font-size: 1.8rem;"></i>
+                    <span class="btn-text">挥拍轨迹图</span>
                 </button>
             </div>
         </div>
@@ -765,9 +771,9 @@
                         <div class="camera-stats">
                             <i class="fas fa-image"></i> 姿态识别中
                         </div>
-                        <div class="camera-stats">
+                        <!-- <div class="camera-stats">
                             <i class="fas fa-microchip"></i> 帧速率: <span id="fps">0</span> FPS
-                        </div>
+                        </div> -->
                     </div>
                 </div>
             </div>
@@ -776,9 +782,9 @@
                 <button class="camera-btn" id="connect-btn" style="flex:1; min-width: 150px; background: rgba(0, 120, 215, 0.3); border: 1px solid rgba(0, 150, 255, 0.5); color: #a0d0ff; padding: 12px; border-radius: 8px; font-size: 1.1rem; cursor: pointer; transition: all 0.3s;">
                     <i class="fas fa-sync-alt"></i> 重新连接
                 </button>
-                <button class="camera-btn" style="flex:1; min-width: 150px; background: rgba(0, 120, 215, 0.3); border: 1px solid rgba(0, 150, 255, 0.5); color: #a0d0ff; padding: 12px; border-radius: 8px; font-size: 1.1rem; cursor: pointer; transition: all 0.3s;">
+                <!-- <button class="camera-btn" style="flex:1; min-width: 150px; background: rgba(0, 120, 215, 0.3); border: 1px solid rgba(0, 150, 255, 0.5); color: #a0d0ff; padding: 12px; border-radius: 8px; font-size: 1.1rem; cursor: pointer; transition: all 0.3s;">
                     <i class="fas fa-cog"></i> 设置
-                </button>
+                </button> -->
                 <button class="camera-btn" style="flex:1; min-width: 150px; background: rgba(0, 120, 215, 0.3); border: 1px solid rgba(0, 150, 255, 0.5); color: #a0d0ff; padding: 12px; border-radius: 8px; font-size: 1.1rem; cursor: pointer; transition: all 0.3s;">
                     <i class="fas fa-expand"></i> 全屏
                 </button>
@@ -831,7 +837,10 @@
                 <button class="modal-close">×</button>
             </div>
             <div class="modal-body">
-                <img src="https://picsum.photos/800/400?random=1" alt="网球击球热力图" class="w-full h-auto rounded-lg mb-4">
+                <!-- 新增居中容器 -->
+                <div style="text-align: center; margin-bottom: 1rem;">
+                    <img src="https://picsum.photos/800/400?random=1" alt="网球击球热力图" class="w-full h-auto rounded-lg mb-4">
+                </div>
                 <p>热力图显示了球员在网球场上的活动频率和击球热点区域。颜色越红表示该区域活动或击球次数越多，有助于分析球员的偏好区域和战术模式。</p>
             </div>
             <div class="modal-footer">
@@ -848,7 +857,10 @@
                 <button class="modal-close">×</button>
             </div>
             <div class="modal-body">
-                <img src="https://picsum.photos/800/400?random=2" alt="网球场地鸟瞰图" class="w-full h-auto rounded-lg mb-4">
+                <!-- 新增居中容器 -->
+                <div style="text-align: center; margin-bottom: 1rem;">
+                    <img src="https://picsum.photos/800/400?random=2" alt="网球场地鸟瞰图" class="w-full h-auto rounded-lg mb-4">
+                </div>
                 <p>鸟瞰图展示了球员在整个网球场上的移动轨迹和位置分布。通过分析轨迹密度和覆盖范围，可以评估球员的防守范围、移动效率和战术跑位。</p>
             </div>
             <div class="modal-footer">
@@ -857,7 +869,7 @@
         </div>
     </div>
 
-    <!-- 模态框3：饼图 -->
+    <!-- 模态框3：成绩统计图 -->
     <div id="modal3" class="modal-backdrop">
         <div class="modal-content">
             <div class="modal-header">
@@ -865,8 +877,11 @@
                 <button class="modal-close">×</button>
             </div>
             <div class="modal-body">
-                <img src="https://picsum.photos/800/400?random=3" alt="网球击球类型饼图" class="w-full h-auto rounded-lg mb-4">
-                <p>饼图直观展示了球员各种击球类型的分布比例，包括正手、反手、截击、高压等。通过分析饼图，可以了解球员的技术优势和弱点，优化训练重点。</p>
+                <!-- 新增居中容器 -->
+                <div style="text-align: center; margin-bottom: 1rem;">
+                    <img src="https://picsum.photos/800/400?random=3" alt="网球击球类型成绩统计图" class="w-full h-auto rounded-lg mb-4">
+                </div>
+                <p>成绩统计图直观展示了球员各种击球类型的分布比例，包括正手、反手、截击、高压等。通过分析成绩统计图，可以了解球员的技术优势和弱点，优化训练重点。</p>
             </div>
             <div class="modal-footer">
                 <button class="modal-btn close-modal">关闭</button>
@@ -882,8 +897,31 @@
                 <button class="modal-close">×</button>
             </div>
             <div class="modal-body">
-                <img src="https://picsum.photos/800/400?random=4" alt="网球挥拍加速度图" class="w-full h-auto rounded-lg mb-4">
+                <!-- 新增居中容器 -->
+                <div style="text-align: center; margin-bottom: 1rem;">
+                    <img src="https://picsum.photos/800/400?random=4" alt="网球挥拍加速度图" class="w-full h-auto rounded-lg mb-4">
+                </div>
                 <p>加速度图显示了球员在击球过程中的挥拍加速度变化。通过分析峰值加速度、加速度曲线形态，可以评估击球力量、节奏控制和技术效率。</p>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn close-modal">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模态框5：挥拍轨迹图 -->
+    <div id="modal5" class="modal-backdrop">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fa fa-random mr-2"></i>挥拍轨迹图分析</h3>
+                <button class="modal-close">×</button>
+            </div>
+            <div class="modal-body">
+                <!-- 新增居中容器 -->
+                <div style="text-align: center; margin-bottom: 1rem;">
+                    <img src="https://picsum.photos/800/400?random=5" alt="网球挥拍轨迹图" class="w-full h-auto rounded-lg mb-4">
+                </div>
+                <p>挥拍轨迹图记录了球员从准备姿势到击球完成的完整手臂运动路径。不同颜色的轨迹线可区分正手、反手等不同技术动作，通过分析轨迹的流畅度、弧度和起止点位置，能精准评估动作规范性与发力效率。</p>
             </div>
             <div class="modal-footer">
                 <button class="modal-btn close-modal">关闭</button>
@@ -933,7 +971,7 @@
                             </div>
                             <div class="chart-item">
                                 <h4><i class="fa fa-pie-chart mr-2"></i>击球类型</h4>
-                                <img src="https://picsum.photos/400/200?random=3" alt="网球击球类型饼图" class="chart-img">
+                                <img src="https://picsum.photos/400/200?random=3" alt="网球击球类型成绩统计图" class="chart-img">
                                 <p>正手：65% | 反手：25% | 截击：10%</p>
                             </div>
                             <div class="chart-item">
@@ -1067,7 +1105,7 @@
         // 连接OpenCV帧流
         function connectStream() {
             // 显示连接状态
-            statsElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 正在连接帧流...';
+            // statsElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 正在连接帧流...';
 
             // 重置FPS计数器
             lastFrameTime = performance.now();
@@ -1082,7 +1120,7 @@
                 // 显示视频流
                 streamImg.style.display = 'block';
                 placeholder.style.display = 'none';
-                statsElement.innerHTML = '<i class="fas fa-microchip"></i> 帧速率: <span id="fps">0</span> FPS';
+                // statsElement.innerHTML = '<i class="fas fa-microchip"></i> 帧速率: <span id="fps">0</span> FPS';
 
                 // 计算FPS
                 const now = performance.now();
@@ -1133,14 +1171,16 @@
             document.getElementById('btn1'),
             document.getElementById('btn2'),
             document.getElementById('btn3'),
-            document.getElementById('btn4')
+            document.getElementById('btn4'),
+            document.getElementById('btn5')
         ];
 
         const modals = [
             document.getElementById('modal1'),
             document.getElementById('modal2'),
             document.getElementById('modal3'),
-            document.getElementById('modal4')
+            document.getElementById('modal4'),
+            document.getElementById('modal5')
         ];
 
         // 打开模态框
