@@ -1256,8 +1256,8 @@
                                 const evalDiv = document.createElement('div');
                                 evalDiv.className = 'shot-evaluation';
                                 evalDiv.innerHTML = `
-                                    <h4>击球 ${latestEval.id} (${latestEval.shot_type}): 评分 ${latestEval.score}/100</h4>
-                                    <p>${latestEval.comments} (${timeStr})</p>
+                                    <h4>击球 评分 ${latestEval.score}/100</h4>
+                                    <p>${latestEval.comments}</p>
                                 `;
                                 // 在顶部插入新评价
                                 evaluationList.insertBefore(evalDiv, evaluationList.firstChild);
