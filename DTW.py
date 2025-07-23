@@ -1,6 +1,5 @@
 import ast
 import os
-
 import numpy as np
 import pandas as pd
 from fastdtw import fastdtw
@@ -9,7 +8,7 @@ from sklearn.svm import SVC, OneClassSVM
 from sklearn.preprocessing import StandardScaler
 import joblib
 
-# 加载正反手分类模型和标准化器
+# 加载正反手分类模型和标准化 “
 shot_type_model_path = "svm_model/optimized_tennis_pose_svm.pkl"
 shot_type_scaler_path = "svm_model/scaler.pkl"
 shot_type_clf = joblib.load(shot_type_model_path)
@@ -30,21 +29,21 @@ data = pd.read_csv('data.csv')
 features = ['langle', 'rangle', 'lsangle', 'rsangle', 'lhangle', 'rhangle', 'lkangle', 'rkangle']
 data_forehand = data[data['class'] == 0][features].values
 data_backhand = data[data['class'] == 1][features].values
-std_mean_forehand = np.mean(data_forehand, axis=0)  # 正手标准均值
-std_mean_backhand = np.mean(data_backhand, axis=0)  # 反手标准均值
+std_mean_forehand = np.mean(data_forehand, axis=0)
+std_mean_backhand = np.mean(data_backhand, axis=0)
 print("正手标准角度均值：", std_mean_forehand)
 print("反手标准角度均值：", std_mean_backhand)
 
-# 正手标准角度与加速度（用于DTW评分）
+# 正手标准角度与加速度
 standard_body_angles_forehand = np.array([
-    [30, 20, 110, 150, 45, 20, 10, 5],
-    [35, 25, 105, 140, 50, 22, 12, 5],
-    [40, 30, 100, 130, 55, 24, 15, 6],
-    [60, 50, 90, 120, 60, 30, 20, 8],
-    [90, 70, 80, 110, 70, 40, 25, 10],
-    [70, 55, 95, 120, 65, 35, 22, 9],
-    [50, 40, 100, 130, 55, 28, 18, 8],
-    [40, 30, 105, 140, 50, 25, 15, 7],
+  [175.3656341825068, 149.64132931817562, 2.774788212212442, 15.082576361448309, 179.00518082835598, 173.25134983909663, 155.11829720083617, 172.99395526839447],
+  [168.06101654169362, 141.57231589261391, 1.5077292395458906, 13.648307764773993, 178.0137267266813, 177.16588445775744, 165.85057664101336, 171.89308386279484],
+  [176.82746755519403, 147.99156828469742, 14.643990499359608, 12.982746275808568, 177.40033909980434, 172.66217080832217, 172.48419586282057, 165.29032699701926],
+  [173.4881183131736, 157.22403864973953, 16.33722195868832, 13.734914198574268, 177.80294263691812, 166.86327056243476, 171.99333527753834, 173.28338608949934],
+  [161.50578895348454, 152.73979464401114, 14.051587599492747, 18.1844606980548, 176.7136205873657, 163.06337218295448, 171.950808634663, 176.94309784472438],
+  [156.46306617196072, 153.85326534292298, 7.2313526994123185, 11.364519884119076, 177.79516139867278, 171.17773800359404, 170.802994523598, 177.05542171519386],
+  [166.93228997676073, 152.23419995117808, 10.742254355261306, 10.355940555803008, 166.69603760559502, 176.73558496294137, 162.11491380775664, 174.2107679514437],
+  [170.88299324152166, 142.53910783397174, 0.2941442398258775, 10.049530338557245, 160.22659211951768, 163.01186927204114, 144.8332541529328, 162.88567551140426]
 ])
 standard_acceleration_forehand = np.array([
     [0.2, 0.1, 0.5],
@@ -57,16 +56,16 @@ standard_acceleration_forehand = np.array([
     [0.3, 0.1, 0.5],
 ])
 
-# 反手标准角度与加速度（用于DTW评分）
+# 反手标准角度与加速度
 standard_body_angles_backhand = np.array([
-    [40, 25, 100, 140, 50, 22, 14, 6],
-    [45, 30, 95, 135, 55, 24, 16, 7],
-    [55, 35, 90, 125, 60, 28, 18, 8],
-    [75, 55, 85, 115, 65, 32, 22, 9],
-    [85, 65, 75, 105, 70, 36, 24, 10],
-    [65, 50, 90, 115, 68, 33, 21, 9],
-    [50, 38, 95, 125, 60, 30, 20, 8],
-    [45, 35, 98, 130, 55, 28, 18, 7],
+  [175.3656341825068, 149.64132931817562, 2.774788212212442, 15.082576361448309, 179.00518082835598, 173.25134983909663, 155.11829720083617, 172.99395526839447],
+  [168.06101654169362, 141.57231589261391, 1.5077292395458906, 13.648307764773993, 178.0137267266813, 177.16588445775744, 165.85057664101336, 171.89308386279484],
+  [176.82746755519403, 147.99156828469742, 14.643990499359608, 12.982746275808568, 177.40033909980434, 172.66217080832217, 172.48419586282057, 165.29032699701926],
+  [173.4881183131736, 157.22403864973953, 16.33722195868832, 13.734914198574268, 177.80294263691812, 166.86327056243476, 171.99333527753834, 173.28338608949934],
+  [161.50578895348454, 152.73979464401114, 14.051587599492747, 18.1844606980548, 176.7136205873657, 163.06337218295448, 171.950808634663, 176.94309784472438],
+  [156.46306617196072, 153.85326534292298, 7.2313526994123185, 11.364519884119076, 177.79516139867278, 171.17773800359404, 170.802994523598, 177.05542171519386],
+  [166.93228997676073, 152.23419995117808, 10.742254355261306, 10.355940555803008, 166.69603760559502, 176.73558496294137, 162.11491380775664, 174.2107679514437],
+  [170.88299324152166, 142.53910783397174, 0.2941442398258775, 10.049530338557245, 160.22659211951768, 163.01186927204114, 144.8332541529328, 162.88567551140426]
 ])
 standard_acceleration_backhand = np.array([
     [0.25, 0.1, 0.4],
@@ -109,25 +108,19 @@ evaluation_map = {
     }
 }
 
-
-# 动作类型判断（使用第4个时间点的8个角度）
 def classify_fore_back(angle_data, svm, scaler):
     arr = np.array(angle_data)
     if arr.shape[0] < 4:
         raise ValueError("动作序列时间点不足，至少需要4个时间点")
-    feat = arr[3]  # 取第4个时间点（索引3）
-    print(f"第4个时间点角度: {feat}")  # 调试：打印第4个时间点角度
+    feat = arr[3]
+    print(f"第4个时间点角度: {feat}")
     feat_scaled = scaler.transform([feat])
     return "正手" if svm.predict(feat_scaled)[0] == 0 else "反手"
 
-
-# 计算 DTW 距离
 def dtw_distance(seq1, seq2):
     distance, _ = fastdtw(seq1, seq2, dist=lambda x, y: norm(np.array(x) - np.array(y)))
     return distance
 
-
-# 评分函数（根据正/反手标准对比）
 def score_shot(player_angles, player_accels, std_angles, std_accels):
     angle_score = 0
     for i in range(8):
@@ -142,95 +135,84 @@ def score_shot(player_angles, player_accels, std_angles, std_accels):
         accel_score += dtw_distance(std_seq, player_seq)
 
     total_dtw = angle_score + accel_score
-    print(f"DTW 距离: {total_dtw}")  # 调试：打印 DTW 距离
-    return round(max(0, 100 * np.exp(-total_dtw / 300)), 2)  # 调整衰减系数
+    print(f"DTW 距离: {total_dtw}")
+    return round(max(0, 100 * np.exp(-total_dtw / 8000)), 2)
 
-
-# 使用OneClassSVM预测标签，异常评价基于训练集标准
 def predict_evaluation(svm_forehand, svm_backhand, scaler_forehand, scaler_backhand, angle_data, shot_type):
     arr = np.array(angle_data)
     if arr.shape[0] < 4:
         raise ValueError("动作序列时间点不足，至少需要4个时间点")
-    feat = np.mean(arr, axis=0)  # OneClassSVM仍使用整个序列均值
-    print(f"动作角度均值: {feat}")  # 调试：打印角度均值
+    feat = np.mean(arr, axis=0)
+    print(f"动作角度均值: {feat}")
     svm = svm_forehand if shot_type == "正手" else svm_backhand
     scaler = scaler_forehand if shot_type == "正手" else scaler_backhand
     feat_scaled = scaler.transform([feat])
     prediction = svm.predict(feat_scaled)
-    print(f"OneClassSVM 预测: {prediction}")  # 调试：打印预测结果
+    print(f"OneClassSVM 预测: {prediction}")
 
     labels = []
-    if prediction[0] == -1:  # 异常动作
+    if prediction[0] == -1:
         std_mean = std_mean_forehand if shot_type == "正手" else std_mean_backhand
-        angle_threshold = 30.0  # 阈值
+        angle_threshold = 30.0
         eval_key = 'forehand' if shot_type == "正手" else 'backhand'
 
-        player_mean = arr[3]  # 使用第4个时间点的角度
-        print(f"第4个时间点角度（用于评价）: {player_mean}")  # 调试
+        player_mean = arr[3]
+        print(f"第4个时间点角度（用于评价）: {player_mean}")
         for i, feature in enumerate(features):
             if player_mean[i] > std_mean[i] + angle_threshold:
                 labels.append(evaluation_map[eval_key][feature]['too_large'])
             elif player_mean[i] < std_mean[i] - angle_threshold:
-                labels.append(evaluation_map[eval_key][feature]['too_small'])
+                labels.append(evaluation_map[eval_key][feature]['-too_small'])
 
-        # 去除重复评价
-        labels = list(dict.fromkeys(labels))  # 保持顺序，去除重复项
+        labels = list(dict.fromkeys(labels))
 
     return labels if labels else ["动作规范，技术到位"]
 
-
-# 处理单个击球数据
-def process_hit(angles, accels):
+def process_hit(angles, accels, timestamp):
     try:
-        # 确保输入格式正确
-        angles = np.array(angles) % 180  # 模180处理
+        angles = np.array(angles) % 180
         accels = np.array(accels)
 
-        # 获取当前击球ID
         shot_id = 1
-        output_file = "shot_evaluation.txt"
+        output_file = "fla/shot_evaluation.txt"
         if os.path.exists(output_file):
             with open(output_file, "r", encoding="utf-8") as f:
-                lines = f.readlines()
+                lines = [line.strip() for line in f if line.strip()]
                 if lines:
-                    last_line = lines[-1].strip().split(" ", 1)[0]
-                    shot_id = int(last_line) + 1 if last_line.isdigit() else 1
+                    try:
+                        last_id = lines[-1].split(" ", 1)[0]
+                        shot_id = int(last_id) + 1 if last_id.isdigit() else 1
+                    except Exception as e:
+                        print(f"警告：无法解析最后一行ID，设置为默认值1。错误：{e}")
 
-        # 分类击球类型
         shot_type = classify_fore_back(angles, shot_type_clf, shot_type_scaler)
         std_angles = standard_body_angles_forehand if shot_type == "正手" else standard_body_angles_backhand
         std_accels = standard_acceleration_forehand if shot_type == "正手" else standard_acceleration_backhand
 
-        # 计算评分
         score = score_shot(angles, accels, std_angles, std_accels)
 
-        # 生成评价
         comments = predict_evaluation(
             oneclass_svm_forehand, oneclass_svm_backhand,
             oneclass_scaler_forehand, oneclass_scaler_backhand,
             angles, shot_type
         )
 
-        # 格式化评价
         comment_str = "，".join(comments)
 
-        # 写入文件
         with open(output_file, "a", encoding="utf-8") as f:
-            f.write(f"{shot_id} {score} {shot_type}：{comment_str}\n")
+            f.write(f"{shot_id} {score} {shot_type} {comment_str} {timestamp}\n")
 
-        # 控制台输出
         print(f"击球 {shot_id}（{shot_type}）：评分 = {score}/100")
         print(f"评价：{comment_str}")
+        print(f"时间戳：{timestamp}")
         print("-" * 50)
 
     except Exception as e:
         print(f"⚠️ 击球处理失败：{e}")
         with open(output_file, "a", encoding="utf-8") as f:
-            f.write(f"{shot_id} 0.0 处理失败：{e}\n")
-
+            f.write(f"{shot_id} 0.0 处理失败：{e} {timestamp}\n")
 
 if __name__ == "__main__":
-    # 批量处理（用于测试）
     def load_hit_moments(file_path):
         all_data = []
         with open(file_path, "r", encoding="utf-8") as f:
@@ -239,17 +221,17 @@ if __name__ == "__main__":
                     continue
                 try:
                     sample = ast.literal_eval(line.strip())
-                    angles = sample[0]
-                    accels = sample[1]
+                    angles = sample["pose"]
+                    accels = sample["accel"]
+                    timestamp = sample["timestamp"]
                     if len(np.array(angles).shape) == 1:
                         angles = [angles]
                     angles = np.array(angles) % 180
-                    all_data.append((angles, accels))
+                    all_data.append((angles, accels, timestamp))
                 except Exception as e:
                     print(f"❌ 解析失败：{e}")
         return all_data
 
-
     data = load_hit_moments("hit_moments.txt")
-    for i, (angles, accels) in enumerate(data, 1):
-        process_hit(angles, accels)
+    for i, (angles, accels, timestamp) in enumerate(data, 1):
+        process_hit(angles, accels, timestamp)

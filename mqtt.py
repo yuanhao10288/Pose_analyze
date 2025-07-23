@@ -49,15 +49,16 @@ def on_message(client, userdata, msg):
 
         elif msg.topic == MQTT_GESTURE_TOPIC:
             # 处理姿势数据（八个身体角度）
+            angles_data = data.get("angles", {})
             angles = [
-                data.get("angle1", 0),
-                data.get("angle2", 0),
-                data.get("angle3", 0),
-                data.get("angle4", 0),
-                data.get("angle5", 0),
-                data.get("angle6", 0),
-                data.get("angle7", 0),
-                data.get("angle8", 0)
+                angles_data.get("left_arm", 0),
+                angles_data.get("right_arm", 0),
+                angles_data.get("left_arm_body", 0),
+                angles_data.get("right_arm_body", 0),
+                angles_data.get("left_hip", 0),
+                angles_data.get("right_hip", 0),
+                angles_data.get("left_knee", 0),
+                angles_data.get("right_knee", 0)
             ]
 
             print(f"Received Gesture - Angles: {angles}")
