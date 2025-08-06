@@ -12,6 +12,9 @@ import os
 import shutil
 import time
 import logging
+import csv
+import json
+from flask import send_from_directory
 
 # 配置日志
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -196,7 +199,7 @@ def get_evaluations():
     try:
         check_and_archive_files()  # 检查并归档文件
         evaluations = []
-        file_path = "shot_evaluation.txt"
+        file_path = "D:\\desk\\Pose_analyze\\fla\\shot_evaluation.txt"
         logger.debug(f"尝试读取文件: {file_path}")
         if os.path.exists(file_path):
             with open(file_path, "r", encoding="utf-8") as f:
@@ -226,6 +229,69 @@ def get_evaluations():
         return jsonify({"evaluations": evaluations[-10:]})
     except Exception as e:
         logger.error(f"获取评价失败: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/track-data', methods=['GET'])
+def get_track_data():
+    try:
+        # 假设CSV文件路径
+        csv_path = "D:\\desk\\Pose_analyze\\fla\\static\\data\\text.csv"
+        times = []
+        ax = []
+        ay = []
+        az = []
+        
+        # 读取CSV文件
+        with open(csv_path, 'r') as file:
+            reader = csv.DictReader(file)
+            for row in reader:
+                times.append(float(row['time(ms)']))
+                ax.append(float(row['ax']))
+                ay.append(float(row['ay']))
+                az.append(float(row['az']))
+        
+        # 计算速度（积分加速度）
+        vx = [0]
+        vy = [0]
+        vz = [0]
+        
+        for i in range(1, len(times)):
+            dt = (times[i] - times[i-1]) / 1000.0  # 转换为秒
+            vx.append(vx[i-1] + ax[i] * dt)
+            vy.append(vy[i-1] + ay[i] * dt)
+            vz.append(vz[i-1] + az[i] * dt)
+        
+        # 计算位置（积分速度）
+        x = [0]
+        y = [0]
+        z = [0]
+        
+        for i in range(1, len(times)):
+            dt = (times[i] - times[i-1]) / 1000.0  # 转换为秒
+            x.append(x[i-1] + vx[i] * dt)
+            y.append(y[i-1] + vy[i] * dt)
+            z.append(z[i-1] + vz[i] * dt)
+        
+        return jsonify({
+            "times": times,
+            "positions": {
+                "x": x,
+                "y": y,
+                "z": z
+            },
+            "accelerations": {
+                "ax": ax,
+                "ay": ay,
+                "az": az
+            },
+            "velocities": {
+                "vx": vx,
+                "vy": vy,
+                "vz": vz
+            }
+        })
+    except Exception as e:
+        logger.error(f"获取轨迹数据失败: {e}")
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':

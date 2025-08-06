@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>智能网球分析系统</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -904,13 +905,16 @@
                 <button class="modal-close">×</button>
             </div>
             <div class="modal-body">
-                <div style="text-align: center; margin-bottom: 1rem;">
-                    <img src="static/images/acce.png" alt="网球挥拍加速度图" class="w-full h-auto rounded-lg mb-4">
+                <div style="display: flex; flex-direction: column; gap: 20px;">
+                    <div id="acceleration-chart" style="height: 500px;"></div>
                 </div>
-                <p>加速度图显示了球员在击球过程中的挥拍加速度变化。通过分析峰值加速度、加速度曲线形态，可以评估击球力量、节奏控制和技术效率。</p>
+                <p style="margin-top: 20px;">加速度图显示了球员在击球过程中的挥拍加速度变化。通过分析峰值加速度、加速度曲线形态，可以评估击球力量、节奏控制和技术效率。</p>
             </div>
             <div class="modal-footer">
                 <button class="modal-btn close-modal">关闭</button>
+                <button id="reload-acceleration-btn" class="modal-btn">
+                    <i class="fas fa-sync-alt"></i> 重新加载数据
+                </button>
             </div>
         </div>
     </div>
@@ -923,13 +927,16 @@
                 <button class="modal-close">×</button>
             </div>
             <div class="modal-body">
-                <div style="text-align: center; margin-bottom: 1rem;">
-                    <img src="static/images/track.png" alt="网球挥拍轨迹图" class="w-full h-auto rounded-lg mb-4">
+                <div style="display: flex; flex-direction: column; gap: 20px;">
+                    <div id="track-chart" style="height: 500px;"></div>
                 </div>
-                <p>挥拍轨迹图记录了球员从准备姿势到击球完成的完整手臂运动路径。不同颜色的轨迹线可区分正手、反手等不同技术动作，通过分析轨迹的流畅度、弧度和起止点位置，能精准评估动作规范性与发力效率。</p>
+                <p style="margin-top: 20px;">挥拍轨迹图记录了球员从准备姿势到击球完成的完整手臂运动路径。通过分析轨迹的流畅度、弧度和起止点位置，能精准评估动作规范性与发力效率。</p>
             </div>
             <div class="modal-footer">
                 <button class="modal-btn close-modal">关闭</button>
+                <button id="reload-track-btn" class="modal-btn">
+                    <i class="fas fa-sync-alt"></i> 重新加载数据
+                </button>
             </div>
         </div>
     </div>
@@ -1309,6 +1316,136 @@
             fetchEvaluations();
             setInterval(fetchEvaluations, 2000);
         });
+
+        let trackChart = null;
+        let accelerationChart = null;
+
+        // 加载并绘制轨迹数据
+        function loadAndPlotTrackData() {
+            fetch('/api/track-data')
+                .then(response => response.json())
+                .then(data => {
+                    // 绘制3D轨迹图
+                    const trace = {
+                        x: data.positions.x,
+                        y: data.positions.y,
+                        z: data.positions.z,
+                        type: 'scatter3d',
+                        mode: 'lines+markers',
+                        marker: {
+                            size: 4,
+                            color: data.times,
+                            colorscale: 'Viridis',
+                            showscale: true
+                        },
+                        line: {
+                            color: 'rgb(0, 200, 255)',
+                            width: 6
+                        },
+                        name: '挥拍轨迹'
+                    };
+                    
+                    const layout = {
+                        title: '网球挥拍三维轨迹',
+                        scene: {
+                            xaxis: { title: 'X轴位置 (m)' },
+                            yaxis: { title: 'Y轴位置 (m)' },
+                            zaxis: { title: 'Z轴位置 (m)' },
+                            camera: {
+                                eye: { x: 1.5, y: 1.5, z: 0.8 }
+                            }
+                        },
+                        margin: { l: 0, r: 0, b: 0, t: 40 }
+                    };
+                    
+                    if (trackChart) {
+                        Plotly.react('track-chart', [trace], layout);
+                    } else {
+                        trackChart = Plotly.newPlot('track-chart', [trace], layout);
+                    }
+                })
+                .catch(error => {
+                    console.error('获取轨迹数据失败:', error);
+                    alert('加载挥拍轨迹数据失败，请检查服务状态');
+                });
+        }
+
+        // 加载并绘制加速度数据
+        function loadAndPlotAccelerationData() {
+            fetch('/api/track-data')
+                .then(response => response.json())
+                .then(data => {
+                    // 绘制加速度图
+                    const accTraceX = {
+                        x: data.times,
+                        y: data.accelerations.ax,
+                        type: 'scatter',
+                        mode: 'lines',
+                        name: 'X轴加速度',
+                        line: { color: '#FF6384', width: 3 }
+                    };
+                    
+                    const accTraceY = {
+                        x: data.times,
+                        y: data.accelerations.ay,
+                        type: 'scatter',
+                        mode: 'lines',
+                        name: 'Y轴加速度',
+                        line: { color: '#36A2EB', width: 3 }
+                    };
+                    
+                    const accTraceZ = {
+                        x: data.times,
+                        y: data.accelerations.az,
+                        type: 'scatter',
+                        mode: 'lines',
+                        name: 'Z轴加速度',
+                        line: { color: '#4BC0C0', width: 3 }
+                    };
+                    
+                    const accLayout = {
+                        title: '三轴加速度变化曲线',
+                        xaxis: { title: '时间 (ms)' },
+                        yaxis: { title: '加速度 (m/s²)' },
+                        margin: { t: 40 },
+                        showlegend: true
+                    };
+                    
+                    if (accelerationChart) {
+                        Plotly.react('acceleration-chart', [accTraceX, accTraceY, accTraceZ], accLayout);
+                    } else {
+                        accelerationChart = Plotly.newPlot('acceleration-chart', [accTraceX, accTraceY, accTraceZ], accLayout);
+                    }
+                })
+                .catch(error => {
+                    console.error('获取加速度数据失败:', error);
+                    alert('加载加速度数据失败，请检查服务状态');
+                });
+        }
+
+        // 修改挥拍轨迹图按钮的点击事件
+        document.getElementById('btn5').addEventListener('click', () => {
+            const modal = document.getElementById('modal5');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            // 加载轨迹数据并绘图
+            loadAndPlotTrackData();
+        });
+
+        // 修改加速度图按钮的点击事件
+        document.getElementById('btn4').addEventListener('click', () => {
+            const modal = document.getElementById('modal4');
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            
+            // 加载加速度数据并绘图
+            loadAndPlotAccelerationData();
+        });
+
+        // 添加重新加载按钮事件
+        document.getElementById('reload-track-btn').addEventListener('click', loadAndPlotTrackData);
+        document.getElementById('reload-acceleration-btn').addEventListener('click', loadAndPlotAccelerationData);
     </script>
 </body>
 </html>
