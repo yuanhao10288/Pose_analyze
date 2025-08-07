@@ -16,6 +16,9 @@ import csv
 import json
 from flask import send_from_directory
 
+# 获取当前文件（app.py）所在目录的绝对路径
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 # 配置日志
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
@@ -199,7 +202,7 @@ def get_evaluations():
     try:
         check_and_archive_files()  # 检查并归档文件
         evaluations = []
-        file_path = "D:\\desk\\Pose_analyze\\fla\\shot_evaluation.txt"
+        file_path = os.path.join(BASE_DIR, "shot_evaluation.txt")
         logger.debug(f"尝试读取文件: {file_path}")
         if os.path.exists(file_path):
             with open(file_path, "r", encoding="utf-8") as f:
@@ -235,7 +238,7 @@ def get_evaluations():
 def get_track_data():
     try:
         # 假设CSV文件路径
-        csv_path = "D:\\desk\\Pose_analyze\\fla\\static\\data\\text.csv"
+        csv_path = os.path.join(BASE_DIR, "static", "data", "text.csv")
         times = []
         ax = []
         ay = []
