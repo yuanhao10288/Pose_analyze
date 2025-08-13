@@ -13,8 +13,7 @@ import shutil
 import time
 import logging
 import csv
-import json
-from flask import send_from_directory
+import math
 
 # 获取当前文件（app.py）所在目录的绝对路径
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -33,7 +32,6 @@ CORS(app, resources={r"/api/*": {
         "http://127.0.0.1:5000"
     ]
 }})
-
 
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'
 os.environ["OPENAI_API_KEY"] = "sk-630b65b0aa5642348fe1fdb1d8ec6c96"
@@ -234,6 +232,94 @@ def get_evaluations():
         logger.error(f"获取评价失败: {e}")
         return jsonify({"error": str(e)}), 500
 
+@app.route('/api/training-stats', methods=['GET'])
+def get_training_stats():
+    try:
+        file_path = os.path.join(BASE_DIR, "shot_evaluation.txt")
+        total_shots = 0
+        successful_shots = 0
+        forehand_shots = 0
+        backhand_shots = 0
+        forehand_successful_shots = 0
+        backhand_successful_shots = 0
+        score_distribution = {
+            "below_60": 0,
+            "between_60_80": 0,
+            "between_80_90": 0,
+            "above_90": 0
+        }
+
+        if os.path.exists(file_path):
+            with open(file_path, "r", encoding="utf-8") as f:
+                for line in f:
+                    if not line.strip():
+                        continue
+                    try:
+                        parts = line.strip().split(" ", 4)
+                        if len(parts) != 5:
+                            continue
+                        score = float(parts[1])  # 第二个字段为评分
+                        shot_type = parts[2]     # 第三个字段为击球类型
+                        total_shots += 1
+                        if score >= 85:
+                            successful_shots += 1
+                        if shot_type == "正手":
+                            forehand_shots += 1
+                            if score >= 85:
+                                forehand_successful_shots += 1
+                        elif shot_type == "反手":
+                            backhand_shots += 1
+                            if score >= 85:
+                                backhand_successful_shots += 1
+                        if score < 60:
+                            score_distribution["below_60"] += 1
+                        elif 60 <= score < 80:
+                            score_distribution["between_60_80"] += 1
+                        elif 80 <= score < 90:
+                            score_distribution["between_80_90"] += 1
+                        else:
+                            score_distribution["above_90"] += 1
+                    except Exception as e:
+                        logger.error(f"解析训练统计行失败: {line.strip()}, 错误: {e}")
+                        continue
+            logger.info(f"训练统计：总击球数 {total_shots}, 成功击球数 {successful_shots}, "
+                        f"正手 {forehand_shots}, 反手 {backhand_shots}")
+        else:
+            logger.warning(f"文件 {file_path} 不存在")
+
+        success_rate = (successful_shots / total_shots * 100) if total_shots > 0 else 0
+        forehand_success_rate = (forehand_successful_shots / forehand_shots * 100) if forehand_shots > 0 else 0
+        backhand_success_rate = (backhand_successful_shots / backhand_shots * 100) if backhand_shots > 0 else 0
+        forehand_percentage = (forehand_shots / total_shots * 100) if total_shots > 0 else 0
+        backhand_percentage = (backhand_shots / total_shots * 100) if total_shots > 0 else 0
+
+        return jsonify({
+            "total_shots": total_shots,
+            "success_rate": success_rate,
+            "forehand_success_rate": forehand_success_rate,
+            "backhand_success_rate": backhand_success_rate,
+            "forehand_percentage": forehand_percentage,
+            "backhand_percentage": backhand_percentage,
+            "score_distribution": score_distribution
+        })
+    except Exception as e:
+        logger.error(f"获取训练统计数据失败: {e}")
+        return jsonify({
+            "total_shots": 0,
+            "success_rate": 0,
+            "forehand_success_rate": 0,
+            "backhand_success_rate": 0,
+            "forehand_percentage": 0,
+            "backhand_percentage": 0,
+            "score_distribution": {
+                "below_60": 0,
+                "between_60_80": 0,
+                "between_80_90": 0,
+                "above_90": 0
+            },
+            "error": str(e)
+        }), 500
+
 @app.route('/api/track-data', methods=['GET'])
 def get_track_data():
     try:
@@ -243,7 +329,7 @@ def get_track_data():
         ax = []
         ay = []
         az = []
-        
+
         # 读取CSV文件
         with open(csv_path, 'r') as file:
             reader = csv.DictReader(file)
@@ -252,29 +338,34 @@ def get_track_data():
                 ax.append(float(row['ax']))
                 ay.append(float(row['ay']))
                 az.append(float(row['az']))
-        
+
         # 计算速度（积分加速度）
         vx = [0]
         vy = [0]
         vz = [0]
-        
+
         for i in range(1, len(times)):
             dt = (times[i] - times[i-1]) / 1000.0  # 转换为秒
             vx.append(vx[i-1] + ax[i] * dt)
             vy.append(vy[i-1] + ay[i] * dt)
             vz.append(vz[i-1] + az[i] * dt)
-        
+
         # 计算位置（积分速度）
         x = [0]
         y = [0]
         z = [0]
-        
+
         for i in range(1, len(times)):
             dt = (times[i] - times[i-1]) / 1000.0  # 转换为秒
             x.append(x[i-1] + vx[i] * dt)
             y.append(y[i-1] + vy[i] * dt)
             z.append(z[i-1] + vz[i] * dt)
-        
+
+        # 计算最大挥拍速度（单位：km/h）
+        speeds = [math.sqrt(vx[i] ** 2 + vy[i] ** 2 + vz[i] ** 2) for i in range(len(vx))]
+        max_speed_ms = max(speeds) if speeds else 0
+        max_speed_kmh = max_speed_ms * 3.6  # 转换为 km/h (1 m/s = 3.6 km/h)
+
         return jsonify({
             "times": times,
             "positions": {
@@ -291,7 +382,8 @@ def get_track_data():
                 "vx": vx,
                 "vy": vy,
                 "vz": vz
-            }
+            },
+            "max_speed": max_speed_kmh
         })
     except Exception as e:
         logger.error(f"获取轨迹数据失败: {e}")

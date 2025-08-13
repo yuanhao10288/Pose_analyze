@@ -7,6 +7,19 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
     <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        /* 添加按钮状态样式 */
+        .camera-btn.start-training {
+            background: rgba(0, 150, 80, 0.3);
+            border: 1px solid rgba(0, 200, 100, 0.5);
+            color: #a0ffa0;
+        }
+        .camera-btn.end-training {
+            background: rgba(215, 40, 40, 0.3);
+            border: 1px solid rgba(255, 100, 100, 0.5);
+            color: #ffa0a0;
+        }
+    </style>
 </head>
 <body>
     <!-- 标题栏 -->
@@ -82,8 +95,8 @@
                 <button class="camera-btn" style="flex:1; min-width: 150px; background: rgba(0, 120, 215, 0.3); border: 1px solid rgba(0, 150, 255, 0.5); color: #a0d0ff; padding: 12px; border-radius: 8px; font-size: 1.1rem; cursor: pointer; transition: all 0.3s;">
                     <i class="fas fa-expand"></i> 全屏
                 </button>
-                <button id="end-training-btn" class="camera-btn" style="flex:1; min-width: 150px; background: rgba(215, 40, 40, 0.3); border: 1px solid rgba(255, 100, 100, 0.5); color: #ffa0a0; padding: 12px; border-radius: 8px; font-size: 1.1rem; cursor: pointer; transition: all 0.3s;">
-                    <i class="fas fa-flag-checkered"></i> 结束训练
+                <button id="training-btn" class="camera-btn start-training" style="flex:1; min-width: 150px; padding: 12px; border-radius: 8px; font-size: 1.1rem; cursor: pointer; transition: all 0.3s;">
+                    <i class="fas fa-play"></i> 开始训练
                 </button>
             </div>
         </div>
@@ -170,8 +183,9 @@
             </div>
             <div class="modal-body">
                 <div style="text-align: center; margin-bottom: 1rem;">
-                    <img src="static/images/score.png" alt="网球击球类型成绩统计图" class="w-full h-auto rounded-lg mb-4">
+                    <div id="score-chart" style="height: 300px;"></div>
                 </div>
+                <p id="shot-type-percentages">正手：计算中... | 反手：计算中...</p>
                 <p>成绩统计图直观展示了球员各种击球类型的分布比例，包括正手、反手、截击、高压等。通过分析成绩统计图，可以了解球员的技术优势和弱点，优化训练重点。</p>
             </div>
             <div class="modal-footer">
@@ -234,19 +248,19 @@
             <div class="modal-body">
                 <div class="summary-stats">
                     <div class="stat-box">
-                        <div class="stat-value">45分钟</div>
+                        <div class="stat-value" id="training-duration">计算中...</div>
                         <div class="stat-label">训练时长</div>
                     </div>
                     <div class="stat-box">
-                        <div class="stat-value">286次</div>
+                        <div class="stat-value" id="total-shots">计算中...</div>
                         <div class="stat-label">总击球数</div>
                     </div>
                     <div class="stat-box">
-                        <div class="stat-value">82%</div>
+                        <div class="stat-value" id="success-rate">计算中...</div>
                         <div class="stat-label">平均成功率</div>
                     </div>
                     <div class="stat-box">
-                        <div class="stat-value">125km/h</div>
+                        <div class="stat-value" id="max-speed">计算中...</div>
                         <div class="stat-label">最大速度</div>
                     </div>
                 </div>
@@ -265,13 +279,13 @@
                             </div>
                             <div class="chart-item">
                                 <h4><i class="fa fa-pie-chart mr-2"></i>击球类型</h4>
-                                <img src="static/images/score.png" alt="网球击球类型成绩统计图" class="chart-img">
-                                <p>正手：65% | 反手：25% | 截击：10%</p>
+                                <div id="summary-score-chart" style="height: 300px;"></div>
+                                <p id="summary-shot-type-percentages">正手：计算中... | 反手：计算中...</p>
                             </div>
                             <div class="chart-item">
                                 <h4><i class="fa fa-line-chart mr-2"></i>加速度</h4>
-                                <img src="static/images/acce.png" alt="网球挥拍加速度图" class="chart-img">
-                                <p>最大挥拍速度：125 km/h</p>
+                                <div id="summary-acceleration-chart" style="height: 300px;"></div>
+                                <p id="summary-max-speed">最大挥拍速度：计算中...</p>
                             </div>
                         </div>
                     </div>
@@ -284,14 +298,14 @@
                                     <div class="progress-bar">
                                         <div class="progress-fill" style="width: 85%; background: linear-gradient(90deg, #00c6ff, #0072ff);"></div>
                                     </div>
-                                    <span>85%</span>
+                                    <span id="forehand-success-rate">85%</span>
                                 </div>
                                 <div class="progress-item">
                                     <span>反手控制</span>
                                     <div class="progress-bar">
                                         <div class="progress-fill" style="width: 72%; background: linear-gradient(90deg, #00ffcc, #00C851);"></div>
                                     </div>
-                                    <span>72%</span>
+                                    <span id="backhand-success-rate">72%</span>
                                 </div>
                                 <div class="progress-item">
                                     <span>移动效率</span>
@@ -300,13 +314,6 @@
                                     </div>
                                     <span>78%</span>
                                 </div>
-                                <div class="progress-item">
-                                    <span>发球准确度</span>
-                                    <div class="progress-bar">
-                                        <div class="progress-fill" style="width: 68%; background: linear-gradient(90deg, #aa66ff, #6610f2);"></div>
-                                    </div>
-                                    <span>68%</span>
-                                </div>
                             </div>
                             <div class="recommendations">
                                 <h5><i class="fas fa-lightbulb mr-2"></i>训练建议：</h5>
@@ -314,7 +321,6 @@
                                     <li>加强反手击球练习，提高稳定性和控制力</li>
                                     <li>增加左侧区域移动训练，改善覆盖范围</li>
                                     <li>尝试不同角度截击练习，提高网前得分能力</li>
-                                    <li>优化发球动作，减少双误次数</li>
                                 </ul>
                             </div>
                         </div>
@@ -450,6 +456,9 @@
             btn.addEventListener('click', () => {
                 modals[index].classList.add('active');
                 document.body.style.overflow = 'hidden';
+                if (index === 2) { // 成绩统计图
+                    loadAndPlotScoreData('score-chart');
+                }
             });
         });
 
@@ -471,17 +480,6 @@
                     closeModal(modal);
                 }
             });
-        });
-
-        document.getElementById('end-training-btn').addEventListener('click', () => {
-            document.getElementById('modal-summary').classList.add('active');
-            document.body.style.overflow = 'hidden';
-        });
-
-        document.getElementById('save-report-btn').addEventListener('click', () => {
-            alert('训练报告已保存！您可以在历史记录中查看。');
-            document.getElementById('modal-summary').classList.remove('active');
-            document.body.style.overflow = '';
         });
 
         const allModals = [...modals, document.getElementById('modal-summary')];
@@ -549,20 +547,17 @@
                                     <h4>击球 评分 ${latestEval.score}/100</h4>
                                     <p>${latestEval.comments}</p>
                                 `;
-                                // 在顶部插入新评价
                                 evaluationList.insertBefore(evalDiv, evaluationList.firstChild);
                                 displayedEvaluations.unshift(evalDiv);
 
-                                // 如果评价数量超过最大限制，移除最早的评价
                                 if (displayedEvaluations.length > maxEvaluations) {
                                     const oldestEval = displayedEvaluations.pop();
                                     oldestEval.classList.add('fade-out');
                                     setTimeout(() => {
                                         oldestEval.remove();
-                                    }, 500); // 等待淡出动画完成
+                                    }, 500);
                                 }
 
-                                // 移除占位符
                                 const placeholder = evaluationList.querySelector('.placeholder');
                                 if (placeholder) {
                                     placeholder.remove();
@@ -602,13 +597,17 @@
 
         let trackChart = null;
         let accelerationChart = null;
+        let summaryAccelerationChart = null;
+        let scoreChart = null;
+        let summaryScoreChart = null;
+        let startTrainingTime = null;
+        let isTraining = false;
 
         // 加载并绘制轨迹数据
         function loadAndPlotTrackData() {
             fetch('/api/track-data')
                 .then(response => response.json())
                 .then(data => {
-                    // 绘制3D轨迹图
                     const trace = {
                         x: data.positions.x,
                         y: data.positions.y,
@@ -627,7 +626,7 @@
                         },
                         name: '挥拍轨迹'
                     };
-                    
+
                     const layout = {
                         title: '网球挥拍三维轨迹',
                         scene: {
@@ -640,7 +639,7 @@
                         },
                         margin: { l: 0, r: 0, b: 0, t: 40 }
                     };
-                    
+
                     if (trackChart) {
                         Plotly.react('track-chart', [trace], layout);
                     } else {
@@ -653,12 +652,11 @@
                 });
         }
 
-        // 加载并绘制加速度数据
-        function loadAndPlotAccelerationData() {
+        // 加载并绘制加速度数据（用于模态框4和总结模态框）
+        function loadAndPlotAccelerationData(containerId = 'acceleration-chart') {
             fetch('/api/track-data')
                 .then(response => response.json())
                 .then(data => {
-                    // 绘制加速度图
                     const accTraceX = {
                         x: data.times,
                         y: data.accelerations.ax,
@@ -667,7 +665,7 @@
                         name: 'X轴加速度',
                         line: { color: '#FF6384', width: 3 }
                     };
-                    
+
                     const accTraceY = {
                         x: data.times,
                         y: data.accelerations.ay,
@@ -676,7 +674,7 @@
                         name: 'Y轴加速度',
                         line: { color: '#36A2EB', width: 3 }
                     };
-                    
+
                     const accTraceZ = {
                         x: data.times,
                         y: data.accelerations.az,
@@ -685,19 +683,35 @@
                         name: 'Z轴加速度',
                         line: { color: '#4BC0C0', width: 3 }
                     };
-                    
+
                     const accLayout = {
                         title: '三轴加速度变化曲线',
                         xaxis: { title: '时间 (ms)' },
                         yaxis: { title: '加速度 (m/s²)' },
                         margin: { t: 40 },
-                        showlegend: true
+                        showlegend: true,
+                        height: containerId === 'summary-acceleration-chart' ? 300 : 500
                     };
-                    
-                    if (accelerationChart) {
+
+                    if (containerId === 'summary-acceleration-chart') {
+                        const maxSpeed = data.max_speed || 0;
+                        document.getElementById('summary-max-speed').textContent = `最大挥拍速度：${maxSpeed.toFixed(0)} km/h`;
+                        document.getElementById('max-speed').textContent = `${maxSpeed.toFixed(0)} km/h`;
+                    }
+
+                    if (containerId === 'acceleration-chart' && accelerationChart) {
                         Plotly.react('acceleration-chart', [accTraceX, accTraceY, accTraceZ], accLayout);
+                    } else if (containerId === 'summary-acceleration-chart' && summaryAccelerationChart) {
+                        Plotly.react('summary-acceleration-chart', [accTraceX, accTraceY, accTraceZ], accLayout);
                     } else {
-                        accelerationChart = Plotly.newPlot('acceleration-chart', [accTraceX, accTraceY, accTraceZ], accLayout);
+                        Plotly.newPlot(containerId, [accTraceX, accTraceY, accTraceZ], accLayout)
+                            .then(() => {
+                                if (containerId === 'acceleration-chart') {
+                                    accelerationChart = true;
+                                } else if (containerId === 'summary-acceleration-chart') {
+                                    summaryAccelerationChart = true;
+                                }
+                            });
                     }
                 })
                 .catch(error => {
@@ -706,13 +720,130 @@
                 });
         }
 
+        // 加载并绘制评分分布饼图
+        function loadAndPlotScoreData(containerId = 'score-chart') {
+            fetch('/api/training-stats')
+                .then(response => response.json())
+                .then(data => {
+                    const trace = {
+                        labels: ['<60', '60-80', '80-90', '≥90'],
+                        values: [
+                            data.score_distribution.below_60,
+                            data.score_distribution.between_60_80,
+                            data.score_distribution.between_80_90,
+                            data.score_distribution.above_90
+                        ],
+                        type: 'pie',
+                        marker: {
+                            colors: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0']
+                        },
+                        textinfo: 'percent+label',
+                        hoverinfo: 'label+value+percent'
+                    };
+
+                    const layout = {
+                        title: '击球评分分布',
+                        height: 300,
+                        margin: { t: 40, b: 20, l: 20, r: 20 }
+                    };
+
+                    if (containerId === 'score-chart' && scoreChart) {
+                        Plotly.react('score-chart', [trace], layout);
+                    } else if (containerId === 'summary-score-chart' && summaryScoreChart) {
+                        Plotly.react('summary-score-chart', [trace], layout);
+                    } else {
+                        Plotly.newPlot(containerId, [trace], layout)
+                            .then(() => {
+                                if (containerId === 'score-chart') {
+                                    scoreChart = true;
+                                } else if (containerId === 'summary-score-chart') {
+                                    summaryScoreChart = true;
+                                }
+                            });
+                    }
+
+                    // 更新正反手百分比
+                    if (containerId === 'score-chart') {
+                        document.getElementById('shot-type-percentages').textContent =
+                            `正手：${data.forehand_percentage.toFixed(0)}% | 反手：${data.backhand_percentage.toFixed(0)}%`;
+                    } else if (containerId === 'summary-score-chart') {
+                        document.getElementById('summary-shot-type-percentages').textContent =
+                            `正手：${data.forehand_percentage.toFixed(0)}% | 反手：${data.backhand_percentage.toFixed(0)}%`;
+                    }
+                })
+                .catch(error => {
+                    console.error('获取评分分布数据失败:', error);
+                    alert('加载评分分布数据失败，请检查服务状态');
+                });
+        }
+
+        // 加载训练统计数据
+        function loadTrainingStats() {
+            fetch('/api/training-stats')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('total-shots').textContent = data.total_shots;
+                    document.getElementById('success-rate').textContent = `${data.success_rate.toFixed(0)}%`;
+                    document.getElementById('forehand-success-rate').textContent = `${data.forehand_success_rate.toFixed(0)}%`;
+                    document.getElementById('backhand-success-rate').textContent = `${data.backhand_success_rate.toFixed(0)}%`;
+                    document.querySelector('.progress-item:nth-child(1) .progress-fill').style.width = `${data.forehand_success_rate}%`;
+                    document.querySelector('.progress-item:nth-child(2) .progress-fill').style.width = `${data.backhand_success_rate}%`;
+                    document.getElementById('summary-shot-type-percentages').textContent =
+                        `正手：${data.forehand_percentage.toFixed(0)}% | 反手：${data.backhand_percentage.toFixed(0)}%`;
+                })
+                .catch(error => {
+                    console.error('获取训练统计数据失败:', error);
+                    document.getElementById('total-shots').textContent = '0';
+                    document.getElementById('success-rate').textContent = '0%';
+                    document.getElementById('forehand-success-rate').textContent = '0%';
+                    document.getElementById('backhand-success-rate').textContent = '0%';
+                    document.getElementById('summary-shot-type-percentages').textContent = '正手：0% | 反手：0%';
+                    alert('加载训练统计数据失败，请检查服务状态');
+                });
+        }
+
+        // 训练按钮逻辑
+        const trainingBtn = document.getElementById('training-btn');
+        trainingBtn.addEventListener('click', () => {
+            const trainingDurationElement = document.getElementById('training-duration');
+            const modal = document.getElementById('modal-summary');
+
+            if (!isTraining) {
+                // 开始训练
+                isTraining = true;
+                startTrainingTime = Date.now();
+                trainingBtn.classList.remove('start-training');
+                trainingBtn.classList.add('end-training');
+                trainingBtn.innerHTML = '<i class="fas fa-flag-checkered"></i> 结束训练';
+                alert('训练已开始！');
+            } else {
+                // 结束训练
+                const currentTime = Date.now();
+                const durationMs = currentTime - startTrainingTime;
+                const durationMin = Math.round(durationMs / 60000); // 转换为分钟
+                trainingDurationElement.textContent = `${durationMin}分钟`;
+
+                // 重置按钮和状态
+                isTraining = false;
+                startTrainingTime = null;
+                trainingBtn.classList.remove('end-training');
+                trainingBtn.classList.add('start-training');
+                trainingBtn.innerHTML = '<i class="fas fa-play"></i> 开始训练';
+
+                // 加载训练统计数据和图表
+                modal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+                loadTrainingStats();
+                loadAndPlotAccelerationData('summary-acceleration-chart');
+                loadAndPlotScoreData('summary-score-chart');
+            }
+        });
+
         // 修改挥拍轨迹图按钮的点击事件
         document.getElementById('btn5').addEventListener('click', () => {
             const modal = document.getElementById('modal5');
             modal.classList.add('active');
             document.body.style.overflow = 'hidden';
-            
-            // 加载轨迹数据并绘图
             loadAndPlotTrackData();
         });
 
@@ -721,14 +852,25 @@
             const modal = document.getElementById('modal4');
             modal.classList.add('active');
             document.body.style.overflow = 'hidden';
-            
-            // 加载加速度数据并绘图
-            loadAndPlotAccelerationData();
+            loadAndPlotAccelerationData('acceleration-chart');
         });
 
         // 添加重新加载按钮事件
         document.getElementById('reload-track-btn').addEventListener('click', loadAndPlotTrackData);
-        document.getElementById('reload-acceleration-btn').addEventListener('click', loadAndPlotAccelerationData);
+        document.getElementById('reload-acceleration-btn').addEventListener('click', () => loadAndPlotAccelerationData('acceleration-chart'));
+
+        // 保存报告按钮
+        document.getElementById('save-report-btn').addEventListener('click', () => {
+            alert('训练报告已保存！您可以在历史记录中查看。');
+            document.getElementById('modal-summary').classList.remove('active');
+            document.body.style.overflow = '';
+            // 重置训练状态
+            isTraining = false;
+            startTrainingTime = null;
+            trainingBtn.classList.remove('end-training');
+            trainingBtn.classList.add('start-training');
+            trainingBtn.innerHTML = '<i class="fas fa-play"></i> 开始训练';
+        });
     </script>
 </body>
 </html>
