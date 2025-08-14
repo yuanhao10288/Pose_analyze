@@ -7,7 +7,7 @@ import re
 # MQTT 服务器配置
 MQTT_BROKER = "me90f19a.ala.cn-hangzhou.emqxsl.cn"
 MQTT_PORT = 8883
-MQTT_TOPIC = "sensors/acceleration"  # 修改为你的实际主题
+MQTT_TOPIC = "message"  # 修改为你的实际主题
 MQTT_USERNAME = "Esp8266"
 MQTT_PASSWORD = "Esp8266"
 

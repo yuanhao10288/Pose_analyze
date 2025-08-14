@@ -267,16 +267,16 @@
                 <div class="summary-container">
                     <div class="charts-section">
                         <div class="chart-grid">
-                            <div class="chart-item">
-                                <h4><i class="fa fa-fire mr-2"></i>热力图</h4>
-                                <img src="static/images/hot.png" alt="网球击球热力图" class="chart-img">
-                                <p>击球热点区域分布：正手区活跃度较高</p>
-                            </div>
-                            <div class="chart-item">
-                                <h4><i class="fa fa-eye mr-2"></i>鸟瞰图</h4>
-                                <img src="static/images/bird.png" alt="网球场地鸟瞰图" class="chart-img">
-                                <p>全场覆盖范围：左侧区域移动较少</p>
-                            </div>
+<!--                            <div class="chart-item">-->
+<!--                                <h4><i class="fa fa-fire mr-2"></i>热力图</h4>-->
+<!--                                <img src="static/images/hot.png" alt="网球击球热力图" class="chart-img">-->
+<!--                                <p>击球热点区域分布：正手区活跃度较高</p>-->
+<!--                            </div>-->
+<!--                            <div class="chart-item">-->
+<!--                                <h4><i class="fa fa-eye mr-2"></i>鸟瞰图</h4>-->
+<!--                                <img src="static/images/bird.png" alt="网球场地鸟瞰图" class="chart-img">-->
+<!--                                <p>全场覆盖范围：左侧区域移动较少</p>-->
+<!--                            </div>-->
                             <div class="chart-item">
                                 <h4><i class="fa fa-pie-chart mr-2"></i>击球类型</h4>
                                 <div id="summary-score-chart" style="height: 300px;"></div>
@@ -544,7 +544,7 @@
                                 const evalDiv = document.createElement('div');
                                 evalDiv.className = 'shot-evaluation';
                                 evalDiv.innerHTML = `
-                                    <h4>击球 评分 ${latestEval.score}/100</h4>
+                                    <h4>${latestEval.shot_type}击球 评分 ${latestEval.score}/100</h4>
                                     <p>${latestEval.comments}</p>
                                 `;
                                 evaluationList.insertBefore(evalDiv, evaluationList.firstChild);
@@ -861,15 +861,45 @@
 
         // 保存报告按钮
         document.getElementById('save-report-btn').addEventListener('click', () => {
-            alert('训练报告已保存！您可以在历史记录中查看。');
-            document.getElementById('modal-summary').classList.remove('active');
-            document.body.style.overflow = '';
-            // 重置训练状态
-            isTraining = false;
-            startTrainingTime = null;
-            trainingBtn.classList.remove('end-training');
-            trainingBtn.classList.add('start-training');
-            trainingBtn.innerHTML = '<i class="fas fa-play"></i> 开始训练';
+            // 获取当前时间戳用于文件名
+            const now = new Date();
+            const timestamp = now.toISOString().replace(/[-:T]/g, '').slice(0, 15); // YYYYMMDD_HHMMSS
+            const filename = `shot_evaluation_${timestamp}.txt`;
+
+            // 请求下载 shot_evaluation.txt
+            fetch('/api/download-shot-evaluation')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`下载失败: ${response.status} ${response.statusText}`);
+                    }
+                    return response.blob();
+                })
+                .then(blob => {
+                    // 创建临时下载链接
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+
+                    // 显示保存提示并关闭模态框
+                    alert('训练报告已保存！您可以在历史记录中查看。');
+                    document.getElementById('modal-summary').classList.remove('active');
+                    document.body.style.overflow = '';
+                    // 重置训练状态
+                    isTraining = false;
+                    startTrainingTime = null;
+                    trainingBtn.classList.remove('end-training');
+                    trainingBtn.classList.add('start-training');
+                    trainingBtn.innerHTML = '<i class="fas fa-play"></i> 开始训练';
+                })
+                .catch(error => {
+                    console.error('下载文件失败:', error);
+                    alert(`下载 shot_evaluation.txt 失败: ${error.message}`);
+                });
         });
     </script>
 </body>

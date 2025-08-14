@@ -1,5 +1,6 @@
+import io
 from datetime import datetime
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_file
 from flask_cors import CORS
 from langchain_community.document_loaders import TextLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -319,6 +320,43 @@ def get_training_stats():
             },
             "error": str(e)
         }), 500
+
+
+@app.route('/api/download-shot-evaluation', methods=['GET'])
+def download_shot_evaluation():
+    try:
+        file_path = os.path.join(BASE_DIR, "shot_evaluation.txt")
+        logger.debug(f"文件路径: {file_path}")
+
+        if not os.path.exists(file_path):
+            logger.warning(f"文件 {file_path} 不存在")
+            return jsonify({"error": "文件不存在"}), 404
+
+        # 检查文件是否为空
+        if os.path.getsize(file_path) == 0:
+            logger.warning(f"文件 {file_path} 为空")
+            return jsonify({"error": "文件为空"}), 400
+
+        # 生成带时间戳的文件名
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"shot_evaluation_{timestamp}.txt"
+
+        # 直接发送文件
+        return send_file(
+            file_path,
+            mimetype='text/plain',
+            as_attachment=True,
+            download_name=filename
+        )
+    except PermissionError as e:
+        logger.error(f"权限错误，无法访问文件 {file_path}: {e}")
+        return jsonify({"error": "无权限访问文件，请检查文件权限"}), 403
+    except UnicodeDecodeError as e:
+        logger.error(f"文件编码错误 {file_path}: {e}")
+        return jsonify({"error": "文件编码错误，无法读取内容"}), 500
+    except Exception as e:
+        logger.error(f"下载文件失败: {str(e)}")
+        return jsonify({"error": f"服务器内部错误: {str(e)}"}), 500
 
 @app.route('/api/track-data', methods=['GET'])
 def get_track_data():
