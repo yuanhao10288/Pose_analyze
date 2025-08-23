@@ -230,7 +230,7 @@ while True:
         }
 
         # 打印数据
-        print(json.dumps(gesture_data, indent=2))
+        # print(json.dumps(gesture_data, indent=2))
 
         # 控制发布频率
         current_time = time.time()

@@ -138,6 +138,8 @@ def score_shot(player_angles, player_accels, std_angles, std_accels):
     print(f"DTW 距离: {total_dtw}")
     return round(max(0, 100 * np.exp(-total_dtw / 8000)), 2)
 
+# ... (其他代码不变)
+
 def predict_evaluation(svm_forehand, svm_backhand, scaler_forehand, scaler_backhand, angle_data, shot_type):
     arr = np.array(angle_data)
     if arr.shape[0] < 4:
@@ -159,10 +161,15 @@ def predict_evaluation(svm_forehand, svm_backhand, scaler_forehand, scaler_backh
         player_mean = arr[3]
         print(f"第4个时间点角度（用于评价）: {player_mean}")
         for i, feature in enumerate(features):
-            if player_mean[i] > std_mean[i] + angle_threshold:
-                labels.append(evaluation_map[eval_key][feature]['too_large'])
-            elif player_mean[i] < std_mean[i] - angle_threshold:
-                labels.append(evaluation_map[eval_key][feature]['-too_small'])
+            diff = player_mean[i] - std_mean[i]
+            if abs(diff) > angle_threshold:
+                direction = 'too_large' if diff > 0 else 'too_small'
+                # 添加键检查，避免KeyError
+                if direction in evaluation_map[eval_key][feature]:
+                    labels.append(evaluation_map[eval_key][feature][direction])
+                else:
+                    print(f"警告: 缺失键 '{direction}' for feature '{feature}' in '{eval_key}'")
+                    labels.append("未知问题")  # 默认消息，避免异常
 
         labels = list(dict.fromkeys(labels))
 
@@ -209,8 +216,11 @@ def process_hit(angles, accels, timestamp):
 
     except Exception as e:
         print(f"⚠️ 击球处理失败：{e}")
+        # 修改写入格式，使其与正常一致：使用"未知"作为shot_type，错误消息作为comment
+        shot_type = "未知"  # 默认shot_type
+        comment_str = f"处理失败：{str(e)}"  # 错误作为comment
         with open(output_file, "a", encoding="utf-8") as f:
-            f.write(f"{shot_id} 0.0 处理失败：{e} {timestamp}\n")
+            f.write(f"{shot_id} 0.0 {shot_type} {comment_str} {timestamp}\n")
 
 if __name__ == "__main__":
     def load_hit_moments(file_path):
