@@ -113,7 +113,7 @@ flask_thread.start()
 
 
 # 替换为树莓派的实际IP和端口
-stream_url = "http://192.168.88.115:8081"
+stream_url = "http://192.168.125.205:8081"
 
 # 创建VideoCapture对象
 cap = cv2.VideoCapture(stream_url)

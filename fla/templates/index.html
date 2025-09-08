@@ -606,58 +606,14 @@
         let startTrainingTime = null;
         let isTraining = false;
 
-        // 加载并绘制轨迹数据
-        function loadAndPlotTrackData() {
-            fetch('/api/track-data')
-                .then(response => response.json())
-                .then(data => {
-                    const trace = {
-                        x: data.positions.x,
-                        y: data.positions.y,
-                        z: data.positions.z,
-                        type: 'scatter3d',
-                        mode: 'lines+markers',
-                        marker: {
-                            size: 4,
-                            color: data.times,
-                            colorscale: 'Viridis',
-                            showscale: true
-                        },
-                        line: {
-                            color: 'rgb(0, 200, 255)',
-                            width: 6
-                        },
-                        name: '挥拍轨迹'
-                    };
-
-                    const layout = {
-                        title: '网球挥拍三维轨迹',
-                        scene: {
-                            xaxis: { title: 'X轴位置 (m)' },
-                            yaxis: { title: 'Y轴位置 (m)' },
-                            zaxis: { title: 'Z轴位置 (m)' },
-                            camera: {
-                                eye: { x: 1.5, y: 1.5, z: 0.8 }
-                            }
-                        },
-                        margin: { l: 0, r: 0, b: 0, t: 40 }
-                    };
-
-                    if (trackChart) {
-                        Plotly.react('track-chart', [trace], layout);
-                    } else {
-                        trackChart = Plotly.newPlot('track-chart', [trace], layout);
-                    }
-                })
-                .catch(error => {
-                    console.error('获取轨迹数据失败:', error);
-                    alert('加载挥拍轨迹数据失败，请检查服务状态');
-                });
-        }
-
         // 加载并绘制加速度数据（用于模态框4和总结模态框）
         function loadAndPlotAccelerationData(containerId = 'acceleration-chart') {
-            fetch('/api/track-data')
+            // 核心修改：根据容器ID区分数据源
+            const apiUrl = containerId === 'summary-acceleration-chart' 
+                ? '/api/summary-track-data'  // 结束训练的加速度图用text.csv
+                : '/api/track-data';        // 模态框4用text2.csv
+
+            fetch(apiUrl)
                 .then(response => response.json())
                 .then(data => {
                     const accTraceX = {
@@ -720,6 +676,56 @@
                 .catch(error => {
                     console.error('获取加速度数据失败:', error);
                     alert('加载加速度数据失败，请检查服务状态');
+                });
+        }
+
+        // 加载并绘制轨迹数据（模态框5专用，使用text2.csv）
+        function loadAndPlotTrackData() {
+            // 固定使用text2.csv的接口
+            fetch('/api/track-data')
+                .then(response => response.json())
+                .then(data => {
+                    const trace = {
+                        x: data.positions.x,
+                        y: data.positions.y,
+                        z: data.positions.z,
+                        type: 'scatter3d',
+                        mode: 'lines+markers',
+                        marker: {
+                            size: 4,
+                            color: data.times,
+                            colorscale: 'Viridis',
+                            showscale: true
+                        },
+                        line: {
+                            color: 'rgb(0, 200, 255)',
+                            width: 6
+                        },
+                        name: '挥拍轨迹'
+                    };
+
+                    const layout = {
+                        title: '网球挥拍三维轨迹',
+                        scene: {
+                            xaxis: { title: 'X轴位置 (m)' },
+                            yaxis: { title: 'Y轴位置 (m)' },
+                            zaxis: { title: 'Z轴位置 (m)' },
+                            camera: {
+                                eye: { x: 1.5, y: 1.5, z: 0.8 }
+                            }
+                        },
+                        margin: { l: 0, r: 0, b: 0, t: 40 }
+                    };
+
+                    if (trackChart) {
+                        Plotly.react('track-chart', [trace], layout);
+                    } else {
+                        trackChart = Plotly.newPlot('track-chart', [trace], layout);
+                    }
+                })
+                .catch(error => {
+                    console.error('获取轨迹数据失败:', error);
+                    alert('加载挥拍轨迹数据失败，请检查服务状态');
                 });
         }
 

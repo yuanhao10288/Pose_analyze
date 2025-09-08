@@ -67,6 +67,22 @@ def process_hit_moment(pose_window, accel_window, timestamp):
             ax, ay, az = accel
             csv_file.write(f"{time_ms:.1f},{ax:.1f},{ay:.1f},{az:.1f}\n")
 
+    # 额外写入击球时刻的加速度数据到 text2.csv
+    CSV_FILE2 = os.path.join("fla", "static", "data", "text2.csv")
+    os.makedirs(os.path.dirname(CSV_FILE2), exist_ok=True)  # 确保目录存在
+    
+    # 清空文件内容，只保留表头
+    with open(CSV_FILE2, "w", encoding="utf-8") as csv_file2:
+        csv_file2.write("time(ms),ax,ay,az\n")
+    
+    # 追加写入击球数据
+    with open(CSV_FILE2, "a", encoding="utf-8") as csv_file2:
+        # 写入八个加速度数据，使用连续时间戳
+        for i, accel in enumerate(accel_window):
+            time_ms = global_time_ms + i * 20.0  # 每次增加 20ms
+            ax, ay, az = accel
+            csv_file2.write(f"{time_ms:.1f},{ax:.1f},{ay:.1f},{az:.1f}\n")
+
     # 计算并写入合加速度到 hit_magnitudes.txt
     MAGNITUDE_FILE = os.path.join("fla", "hit_magnitudes.txt")
     os.makedirs(os.path.dirname(MAGNITUDE_FILE), exist_ok=True)  # 确保目录存在
